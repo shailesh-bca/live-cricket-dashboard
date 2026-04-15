@@ -5,7 +5,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "change-this-in-production")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "live-cricket-dashboard.onrender.com").split(",")
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://live-cricket-dashboard.onrender.com",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
