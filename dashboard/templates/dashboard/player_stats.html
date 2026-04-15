@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Stats</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+</head>
+<body>
+<div class="page-wrapper admin-page">
+    <header class="topbar">
+        <div class="logo">Player Stats</div>
+        <div class="topbar-actions">
+            <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
+            <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+            <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Top Player Statistics</h3>
+                <p class="section-subtitle">Full batting and bowling records in a cleaner separate page.</p>
+            </div>
+
+            <div class="stats-hero-grid">
+                <div class="mini-stat-card">
+                    <div class="mini-stat-label">Total Players</div>
+                    <div class="mini-stat-value">{{ player_stats|length }}</div>
+                </div>
+
+                <div class="mini-stat-card">
+                    <div class="mini-stat-label">Top Scorer</div>
+                    <div class="mini-stat-value">
+                        {% if player_stats %}
+                            {{ player_stats.0.name }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mini-stat-card">
+                    <div class="mini-stat-label">Best Runs</div>
+                    <div class="mini-stat-value">
+                        {% if player_stats %}
+                            {{ player_stats.0.runs }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Team</th>
+                            <th>Runs</th>
+                            <th>Balls</th>
+                            <th>Strike Rate</th>
+                            <th>Wickets</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in player_stats %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <div class="table-name-cell">
+                                    <span class="table-avatar">{{ stat.name|slice:":1" }}</span>
+                                    <span>{{ stat.name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ stat.team|default:"-" }}</td>
+                            <td>{{ stat.runs }}</td>
+                            <td>{{ stat.balls }}</td>
+                            <td>{{ stat.strike_rate }}</td>
+                            <td>{{ stat.wickets }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">No player stats available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mobile-cards-grid">
+                {% for stat in player_stats %}
+                <div class="mobile-data-card">
+                    <div class="mobile-card-head">
+                        <div class="table-name-cell">
+                            <span class="table-avatar">{{ stat.name|slice:":1" }}</span>
+                            <span>{{ stat.name }}</span>
+                        </div>
+                        <span class="mini-live">{{ stat.team|default:"-" }}</span>
+                    </div>
+
+                    <div class="mobile-stats-grid">
+                        <div><strong>Runs</strong><span>{{ stat.runs }}</span></div>
+                        <div><strong>Balls</strong><span>{{ stat.balls }}</span></div>
+                        <div><strong>SR</strong><span>{{ stat.strike_rate }}</span></div>
+                        <div><strong>Wkts</strong><span>{{ stat.wickets }}</span></div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="mobile-data-card">No player stats available.</div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

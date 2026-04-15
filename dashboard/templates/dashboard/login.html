@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            background: linear-gradient(90deg, #001a26, #06243a, #001a26);
+            font-family: Arial;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            background: #0f2a3f;
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00cfff;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Scoring Panel Login</h2>
+
+    {% for message in messages %}
+        <p class="error">{{ message }}</p>
+    {% endfor %}
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+</body>
+</html>

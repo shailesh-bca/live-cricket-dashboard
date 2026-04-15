@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Points Table</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+</head>
+<body>
+<div class="page-wrapper admin-page">
+    <header class="topbar">
+        <div class="logo">Points Table</div>
+        <div class="topbar-actions">
+            <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
+            <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+            <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">League Table</h3>
+                <p class="section-subtitle">Separate page for standings with improved readability and mobile layout.</p>
+            </div>
+
+            <div class="stats-hero-grid">
+                <div class="mini-stat-card">
+                    <div class="mini-stat-label">Teams</div>
+                    <div class="mini-stat-value">{{ points_table|length }}</div>
+                </div>
+
+                <div class="mini-stat-card">
+                    <div class="mini-stat-label">Table Leader</div>
+                    <div class="mini-stat-value">
+                        {% if points_table %}
+                            {{ points_table.0.team }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mini-stat-card">
+                    <div class="mini-stat-label">Top Points</div>
+                    <div class="mini-stat-value">
+                        {% if points_table %}
+                            {{ points_table.0.points }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Team</th>
+                            <th>P</th>
+                            <th>W</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>NR</th>
+                            <th>Pts</th>
+                            <th>NRR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in points_table %}
+                        <tr>
+                            <td>
+                                {% if forloop.counter == 1 %}
+                                    <span class="position-badge top-rank">1</span>
+                                {% elif forloop.counter == 2 %}
+                                    <span class="position-badge second-rank">2</span>
+                                {% else %}
+                                    <span class="position-badge">{{ forloop.counter }}</span>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ row.team }}</strong></td>
+                            <td>{{ row.played }}</td>
+                            <td>{{ row.won }}</td>
+                            <td>{{ row.lost }}</td>
+                            <td>{{ row.tied }}</td>
+                            <td>{{ row.no_result }}</td>
+                            <td>{{ row.points }}</td>
+                            <td>{{ row.net_run_rate }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9">No points table rows available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mobile-cards-grid">
+                {% for row in points_table %}
+                <div class="mobile-data-card">
+                    <div class="mobile-card-head">
+                        <strong>{{ forloop.counter }}. {{ row.team }}</strong>
+                        <span class="mini-live">{{ row.points }} pts</span>
+                    </div>
+
+                    <div class="mobile-stats-grid">
+                        <div><strong>P</strong><span>{{ row.played }}</span></div>
+                        <div><strong>W</strong><span>{{ row.won }}</span></div>
+                        <div><strong>L</strong><span>{{ row.lost }}</span></div>
+                        <div><strong>T</strong><span>{{ row.tied }}</span></div>
+                        <div><strong>NR</strong><span>{{ row.no_result }}</span></div>
+                        <div><strong>NRR</strong><span>{{ row.net_run_rate }}</span></div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="mobile-data-card">No points table rows available.</div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

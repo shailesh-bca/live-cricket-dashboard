@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Matches</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+</head>
+<body>
+<div class="page-wrapper admin-page">
+    <header class="topbar">
+        <div class="logo">All Cricket Matches</div>
+        <div class="quick-links">
+            <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Match List</h3>
+                <p class="section-subtitle">Every saved match with a quick path back into the dashboard.</p>
+            </div>
+
+            {% if matches %}
+            <div class="matches-grid">
+                {% for match in matches %}
+                <article class="glass-card match-card">
+                    <div class="match-card-top">
+                        <div class="match-name teams-with-logos">
+                            <span class="team-with-logo">
+                                <img
+                                    src="{% static match.team1_logo %}"
+                                    alt="{{ match.team1 }}"
+                                    class="team-logo small-logo"
+                                    onerror="this.src='/static/dashboard/images/teams/default.png'"
+                                >
+                                <span>{{ match.team1 }}</span>
+                            </span>
+
+                            <span class="vs-text">vs</span>
+
+                            <span class="team-with-logo">
+                                <img
+                                    src="{% static match.team2_logo %}"
+                                    alt="{{ match.team2 }}"
+                                    class="team-logo small-logo"
+                                    onerror="this.src='/static/dashboard/images/teams/default.png'"
+                                >
+                                <span>{{ match.team2 }}</span>
+                            </span>
+                        </div>
+
+                        <div class="mini-live">{{ match.status }}</div>
+                    </div>
+
+                    <div class="match-score">{{ match.runs }}/{{ match.wickets }}</div>
+                    <div class="match-overs">Overs: {{ match.overs }}</div>
+
+                    <div class="match-meta">
+                        <span>{{ match.result_text|default:"Match in progress" }}</span>
+                        <span>{{ match.created_at|date:"d M Y H:i" }}</span>
+                    </div>
+
+                    <div class="quick-links" style="margin-top: 18px;">
+                        <a href="/?match_id={{ match.id }}" class="btn primary-btn">Open Dashboard</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="section-subtitle">No matches yet. Create one from the scoring panel.</p>
+            {% endif %}
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorecard</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+</head>
+<body>
+<div class="page-wrapper admin-page">
+    <header class="topbar">
+        <div class="logo">Scorecard</div>
+        <div class="topbar-actions">
+            <a href="{% url 'index' %}?match_id={{ match.id }}" class="btn primary-btn">Live Dashboard</a>
+            <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        {% if match %}
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">{{ match.team1 }} vs {{ match.team2 }}</h3>
+                <p class="section-subtitle">{{ match.result_text|default:"Live scorecard" }}</p>
+            </div>
+
+            <div class="innings-switcher">
+                <div class="innings-pill">{{ match.team1 }} {{ match.first_innings_runs }}-{{ match.first_innings_wickets }} ({{ match.first_innings_overs }})</div>
+                <div class="innings-pill active-pill">{{ match.batting_team }} {{ match.runs }}-{{ match.wickets }} ({{ match.overs }})</div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">First Innings</h3>
+            </div>
+            <div class="table-wrap">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Batter</th>
+                            <th>Dismissal</th>
+                            <th>R</th>
+                            <th>B</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>SR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in first_innings_scorecard %}
+                        <tr>
+                            <td>{{ row.player_name }}</td>
+                            <td>{{ row.wicket_info|default:"NOT OUT" }}</td>
+                            <td>{{ row.runs }}</td>
+                            <td>{{ row.balls }}</td>
+                            <td>{{ row.fours }}</td>
+                            <td>{{ row.sixes }}</td>
+                            <td>{{ row.strike_rate }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7">No first innings data.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Second Innings</h3>
+            </div>
+            <div class="table-wrap">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Batter</th>
+                            <th>Dismissal</th>
+                            <th>R</th>
+                            <th>B</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>SR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in second_innings_scorecard %}
+                        <tr>
+                            <td>{{ row.player_name }}</td>
+                            <td>{{ row.wicket_info|default:"NOT OUT" }}</td>
+                            <td>{{ row.runs }}</td>
+                            <td>{{ row.balls }}</td>
+                            <td>{{ row.fours }}</td>
+                            <td>{{ row.sixes }}</td>
+                            <td>{{ row.strike_rate }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7">No second innings data.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% else %}
+        <section class="glass-card">
+            <p class="section-subtitle">No match selected.</p>
+        </section>
+        {% endif %}
+    </main>
+</div>
+</body>
+</html>

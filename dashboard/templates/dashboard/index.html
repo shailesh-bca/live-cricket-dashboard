@@ -1,0 +1,706 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Cricket Dashboard</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+</head>
+<body>
+<div class="main-layout">
+    <aside class="side-banner left-banner">
+        <img src="{% static 'dashboard/images/left-player.png' %}" alt="Left Cricketer">
+    </aside>
+
+    <div class="page-wrapper">
+        <header class="topbar">
+            <div class="logo">Live Cricket Dashboard</div>
+            <div class="topbar-actions">
+              <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+              <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
+              <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+            <div class="live-badge blink">LIVE</div>
+         </div>
+        </header>
+
+        <main class="live-dashboard">
+            <section class="glass-card hero-card" id="liveMatchCard">
+                <div class="match-header">
+                    <div>
+                        <p class="match-label">LIVE MATCH</p>
+
+                        <h2 class="match-title match-title-with-logos">
+                            <span class="team-with-logo" id="team1Wrap">
+                                <img
+                                    src="{% static team1_logo %}"
+                                    alt="{{ match.team1 }}"
+                                    class="team-logo"
+                                    id="team1Logo"
+                                    onerror="this.src='/static/dashboard/images/teams/default.png'"
+                                >
+                                <span id="team1">{{ match.team1|default:"Team A" }}</span>
+                                <span id="team1Winner" class="winner-badge" style="display:none;">🏆 Winner</span>
+                            </span>
+
+                            <span class="vs-text">vs</span>
+
+                            <span class="team-with-logo" id="team2Wrap">
+                                <img
+                                    src="{% static team2_logo %}"
+                                    alt="{{ match.team2 }}"
+                                    class="team-logo"
+                                    id="team2Logo"
+                                    onerror="this.src='/static/dashboard/images/teams/default.png'"
+                                >
+                                <span id="team2">{{ match.team2|default:"Team B" }}</span>
+                                <span id="team2Winner" class="winner-badge" style="display:none;">🏆 Winner</span>
+                            </span>
+                        </h2>
+                    </div>
+
+                    <div class="status-pill" id="matchStatus">{{ match.status|default:"In Progress" }}</div>
+                </div>
+
+                <div class="score-layout">
+                    <div class="team-score-side">
+                        <p class="small-label">Batting Team</p>
+                        <div class="team-box-with-logo">
+                            <img
+                                src="{% static team1_logo %}"
+                                alt="{{ match.batting_team|default:match.team1 }}"
+                                class="team-logo side-team-logo"
+                                id="battingTeamLogo"
+                                onerror="this.src='/static/dashboard/images/teams/default.png'"
+                            >
+                            <h3 id="team1Side">{{ match.batting_team|default:match.team1|default:"Team A" }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="score-center">
+                        <div id="score1" class="score-big">{{ match.runs|default:0 }}/{{ match.wickets|default:0 }}</div>
+                        <div class="overs-text">Overs: <span id="overs">{{ match.overs|default:"0.0" }}</span></div>
+
+                        <div id="winnerBanner" class="winner-banner" style="display:none;"></div>
+
+                        <div class="mini-stats">
+                            <span>CRR: <strong id="runrate">0.00</strong></span>
+                            <span>Status: <strong id="resultText">{{ match.result_text|default:"Live" }}</strong></span>
+                        </div>
+
+                        <div class="mini-stats" style="margin-top:10px;">
+                            <span>Win Probability: <strong id="winProbability">50%</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="team-score-side align-right">
+                        <p class="small-label">Bowling Team</p>
+                        <div class="team-box-with-logo team-box-right">
+                            <img
+                                src="{% static team2_logo %}"
+                                alt="{{ match.bowling_team|default:match.team2 }}"
+                                class="team-logo side-team-logo"
+                                id="bowlingTeamLogo"
+                                onerror="this.src='/static/dashboard/images/teams/default.png'"
+                            >
+                            <h3 id="team2Side">{{ match.bowling_team|default:match.team2|default:"Team B" }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+    <div class="section-header">
+        <h3 class="neon">Match Summary</h3>
+        <p class="section-subtitle">Live batting partnership, bowler figures, and player of the match.</p>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-main-card">
+            <div class="summary-player-block three-col-summary">
+    <div class="summary-player">
+        <div class="summary-avatar">🏏</div>
+        <div>
+            <div class="summary-small-label">Striker</div>
+            <div class="summary-player-name" id="batsman">Striker</div>
+            <div class="summary-player-meta">
+                <span id="batRuns">0 (0)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-player">
+        <div class="summary-avatar">🏏</div>
+        <div>
+            <div class="summary-small-label">Non-Striker</div>
+            <div class="summary-player-name" id="nonStriker">Non-Striker</div>
+            <div class="summary-player-meta">
+                <span id="nonStrikerRuns">0 (0)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-player">
+        <div class="summary-avatar">🎯</div>
+        <div>
+            <div class="summary-small-label">Bowler</div>
+            <div class="summary-player-name" id="bowler">Bowler</div>
+            <div class="summary-player-meta">
+                Wickets: <span id="bowlWk">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div class="summary-bottom-row">
+                <div class="summary-chip">
+                    Partnership: <strong id="partnershipText">0 (0)</strong>
+                </div>
+                <div class="summary-chip">
+                    Last Wicket: <strong id="lastWicketText">None</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-pom-card" id="playerOfMatchCard" style="display:none;">
+            <div class="pom-title">Player of the Match</div>
+            <div class="pom-avatar">⭐</div>
+            <div class="pom-name" id="pomName">-</div>
+            <div class="pom-team" id="pomTeam">-</div>
+            <div class="pom-figures" id="pomFigures">-</div>
+        </div>
+    </div>
+
+    <div class="stats-button-wrap">
+        <a href="{% url 'scorecard_page' %}?match_id={{ match.id }}" class="btn primary-btn">
+            View Scorecard
+        </a>
+    </div>
+</section>
+
+            <section class="glass-card">
+                <div class="section-header">
+                    <h3 class="neon">Player Stats</h3>
+                    <p class="section-subtitle">Batting and wicket snapshots below the current players.</p>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Runs</th>
+                                <th>Balls</th>
+                                <th>Strike Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="playerStatsBody">
+                            {% for stat in player_stats %}
+                            <tr>
+                                <td>{{ stat.name }}</td>
+                                <td>{{ stat.runs }}</td>
+                                <td>{{ stat.balls }}</td>
+                                <td>{{ stat.strike_rate }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">No player stats found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="section-header">
+                    <h3 class="neon">This Over</h3>
+                    <p class="section-subtitle">Ball by ball summary</p>
+                </div>
+
+                <div class="over-summary">
+                    <div class="over-title">Over <span id="overNo">1</span></div>
+                    <div id="overBalls" class="ball-list">
+                        <span class="ball-item">0</span>
+                    </div>
+                    <div class="over-total">Total: <span id="overTotal">0</span></div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="section-header">
+                    <h3 class="neon">Live Commentary</h3>
+                    <p class="section-subtitle">Automatic ball-by-ball commentary</p>
+                </div>
+
+                <div id="commentaryBox" class="commentary-box">
+                    <p class="commentary-line">No commentary yet.</p>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="section-header">
+                    <h3 class="neon">Runs Progress</h3>
+                    <p class="section-subtitle">Live score growth by over</p>
+                </div>
+
+                <div class="chart-wrap">
+                    <canvas id="runsChart"></canvas>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="section-header">
+                    <h3 class="neon">Points Table</h3>
+                    <p class="section-subtitle">League standings for the teams you manage from the admin panel.</p>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th>P</th>
+                                <th>W</th>
+                                <th>L</th>
+                                <th>T</th>
+                                <th>NR</th>
+                                <th>Pts</th>
+                                <th>NRR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pointsTableBody">
+                            {% for row in points_table %}
+                            <tr>
+                                <td>{{ row.team }}</td>
+                                <td>{{ row.played }}</td>
+                                <td>{{ row.won }}</td>
+                                <td>{{ row.lost }}</td>
+                                <td>{{ row.tied }}</td>
+                                <td>{{ row.no_result }}</td>
+                                <td>{{ row.points }}</td>
+                                <td>{{ row.net_run_rate }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8">No points table entries yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <aside class="side-banner right-banner">
+        <img src="{% static 'dashboard/images/right-player.png' %}" alt="Right Cricketer">
+    </aside>
+</div>
+
+<audio id="wicketSound" src="{% static 'dashboard/sounds/wicket.mp3' %}"></audio>
+<audio id="sixSound" src="{% static 'dashboard/sounds/six.mp3' %}"></audio>
+<audio id="fourSound" src="{% static 'dashboard/sounds/four.mp3' %}"></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let selectedMatchId = "{{ match.id|default:'' }}";
+let runsChart = null;
+let lastBallEvent = null;
+
+const STATIC_BASE = "/static/dashboard/images/teams/";
+
+function getMatchQuery() {
+    return selectedMatchId ? `?match_id=${selectedMatchId}` : "";
+}
+
+function getLogoPath(teamName) {
+    const logos = {
+        "PBKS": STATIC_BASE + "pbks.png",
+        "SRH": STATIC_BASE + "srh.png",
+        "MI": STATIC_BASE + "mi.png",
+        "CSK": STATIC_BASE + "csk.png",
+        "RCB": STATIC_BASE + "rcb.png",
+        "KKR": STATIC_BASE + "kkr.png",
+        "DC": STATIC_BASE + "dc.png",
+        "RR": STATIC_BASE + "rr.png",
+        "LSG": STATIC_BASE + "lsg.png",
+        "GT": STATIC_BASE + "gt.png",
+        "Punjab Kings": STATIC_BASE + "pbks.png",
+        "Sunrisers Hyderabad": STATIC_BASE + "srh.png",
+        "Mumbai Indians": STATIC_BASE + "mi.png",
+        "Chennai Super Kings": STATIC_BASE + "csk.png",
+        "Royal Challengers Bangalore": STATIC_BASE + "rcb.png",
+        "Royal Challengers Bengaluru": STATIC_BASE + "rcb.png",
+        "Kolkata Knight Riders": STATIC_BASE + "kkr.png",
+        "Delhi Capitals": STATIC_BASE + "dc.png",
+        "Rajasthan Royals": STATIC_BASE + "rr.png",
+        "Lucknow Super Giants": STATIC_BASE + "lsg.png",
+        "Gujarat Titans": STATIC_BASE + "gt.png"
+    };
+
+    return logos[teamName] || (STATIC_BASE + "default.png");
+}
+
+function normalizeTeamClass(teamName) {
+    const map = {
+        "PBKS": "team-pbks",
+        "Punjab Kings": "team-pbks",
+        "SRH": "team-srh",
+        "Sunrisers Hyderabad": "team-srh",
+        "MI": "team-mi",
+        "Mumbai Indians": "team-mi",
+        "CSK": "team-csk",
+        "Chennai Super Kings": "team-csk",
+        "RCB": "team-rcb",
+        "Royal Challengers Bangalore": "team-rcb",
+        "Royal Challengers Bengaluru": "team-rcb",
+        "KKR": "team-kkr",
+        "Kolkata Knight Riders": "team-kkr",
+        "DC": "team-dc",
+        "Delhi Capitals": "team-dc",
+        "RR": "team-rr",
+        "Rajasthan Royals": "team-rr",
+        "LSG": "team-lsg",
+        "Lucknow Super Giants": "team-lsg",
+        "GT": "team-gt",
+        "Gujarat Titans": "team-gt"
+    };
+
+    return map[teamName] || "";
+}
+
+function playMatchSound(eventText) {
+    const wicketSound = document.getElementById("wicketSound");
+    const sixSound = document.getElementById("sixSound");
+    const fourSound = document.getElementById("fourSound");
+
+    if (eventText === "W" && wicketSound) {
+        wicketSound.currentTime = 0;
+        wicketSound.play().catch(() => {});
+    } else if (eventText === "6" && sixSound) {
+        sixSound.currentTime = 0;
+        sixSound.play().catch(() => {});
+    } else if (eventText === "4" && fourSound) {
+        fourSound.currentTime = 0;
+        fourSound.play().catch(() => {});
+    }
+}
+
+function createChart() {
+    const canvas = document.getElementById("runsChart");
+    if (!canvas) return;
+
+    runsChart = new Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: "First Innings",
+                    data: [],
+                    borderColor: "#16f2ff",
+                    backgroundColor: "rgba(22, 242, 255, 0.12)",
+                    tension: 0.35,
+                    fill: false,
+                    pointBackgroundColor: "#16f2ff",
+                    pointBorderColor: "#ffffff",
+                    pointRadius: 4,
+                    borderWidth: 3,
+                    spanGaps: true
+                },
+                {
+                    label: "Second Innings",
+                    data: [],
+                    borderColor: "#ffd54f",
+                    backgroundColor: "rgba(255, 213, 79, 0.12)",
+                    tension: 0.35,
+                    fill: false,
+                    pointBackgroundColor: "#ffd54f",
+                    pointBorderColor: "#ffffff",
+                    pointRadius: 4,
+                    borderWidth: 3,
+                    spanGaps: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#ffffff"
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: "rgba(255,255,255,0.7)"
+                    },
+                    grid: {
+                        color: "rgba(255,255,255,0.06)"
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: "rgba(255,255,255,0.7)"
+                    },
+                    grid: {
+                        color: "rgba(255,255,255,0.06)"
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateScoreboard() {
+    fetch(`/get-score/${getMatchQuery()}`)
+        .then(res => res.json())
+        .then(data => {
+            const team1 = data.team1 || "Team A";
+            const team2 = data.team2 || "Team B";
+            const battingTeam = data.batting_team || team1;
+            const bowlingTeam = data.bowling_team || team2;
+            const resultText = data.result_text || data.status || "Live";
+
+            document.getElementById("team1").innerText = team1.toUpperCase();
+            document.getElementById("team2").innerText = team2.toUpperCase();
+            document.getElementById("team1Side").innerText = battingTeam.toUpperCase();
+            document.getElementById("team2Side").innerText = bowlingTeam.toUpperCase();
+
+            document.getElementById("team1Logo").src = getLogoPath(team1);
+            document.getElementById("team2Logo").src = getLogoPath(team2);
+            document.getElementById("battingTeamLogo").src = getLogoPath(battingTeam);
+            document.getElementById("bowlingTeamLogo").src = getLogoPath(bowlingTeam);
+
+            document.getElementById("score1").innerText = `${data.runs ?? 0}/${data.wickets ?? 0}`;
+            document.getElementById("overs").innerText = data.overs || "0.0";
+            document.getElementById("resultText").innerText = resultText;
+            document.getElementById("winProbability").innerText = `${data.win_probability ?? 50}%`;
+
+            const matchStatus = document.getElementById("matchStatus");
+            matchStatus.innerText = data.status || "In Progress";
+            matchStatus.classList.remove("completed");
+            if ((data.status || "").toLowerCase() === "completed") {
+                matchStatus.classList.add("completed");
+            }
+
+            const overs = parseFloat(data.overs) || 0;
+            const runs = parseInt(data.runs, 10) || 0;
+            const runrate = overs > 0 ? (runs / overs).toFixed(2) : "0.00";
+            document.getElementById("runrate").innerText = runrate;
+
+            const team1Winner = document.getElementById("team1Winner");
+            const team2Winner = document.getElementById("team2Winner");
+            team1Winner.style.display = "none";
+            team2Winner.style.display = "none";
+
+            if (resultText.toLowerCase().includes("won")) {
+                if (resultText.toLowerCase().includes(team1.toLowerCase())) {
+                    team1Winner.style.display = "inline-flex";
+                } else if (resultText.toLowerCase().includes(team2.toLowerCase())) {
+                    team2Winner.style.display = "inline-flex";
+                }
+            }
+
+            const liveCard = document.querySelector(".hero-card");
+            liveCard.classList.remove(
+                "team-pbks", "team-srh", "team-mi", "team-csk", "team-rcb",
+                "team-kkr", "team-dc", "team-rr", "team-lsg", "team-gt"
+            );
+
+            const battingThemeClass = normalizeTeamClass(battingTeam);
+            if (battingThemeClass) {
+                liveCard.classList.add(battingThemeClass);
+            }
+
+            const winnerBanner = document.getElementById("winnerBanner");
+            if (resultText.toLowerCase().includes("won")) {
+                winnerBanner.style.display = "block";
+                winnerBanner.innerText = "🏆 " + resultText;
+            } else {
+                winnerBanner.style.display = "none";
+                winnerBanner.innerText = "";
+            }
+            
+            document.getElementById("partnershipText").innerText =
+           `${data.partnership_runs ?? 0} (${data.partnership_balls ?? 0})`;
+
+            document.getElementById("lastWicketText").innerText =
+              data.last_wicket_text || "None";
+
+           const pomCard = document.getElementById("playerOfMatchCard");
+          const pomName = document.getElementById("pomName");
+          const pomTeam = document.getElementById("pomTeam");
+         const pomFigures = document.getElementById("pomFigures");
+
+      if ((data.status || "").toLowerCase() === "completed" && data.player_of_match) {
+          pomCard.style.display = "block";
+          pomName.innerText = data.player_of_match;
+         pomTeam.innerText = data.player_of_match_team || "-";
+         pomFigures.innerText = data.player_of_match_figures || "-";
+}      else {
+       pomCard.style.display = "none";
+}
+        });
+}
+
+function updatePlayers() {
+    fetch(`/players-api/${getMatchQuery()}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("batsman").innerText = data.name || "No batsman";
+            document.getElementById("batRuns").innerText = `${data.runs ?? 0} (${data.balls ?? 0})`;
+
+            document.getElementById("nonStriker").innerText = data.non_striker || "No non-striker";
+            document.getElementById("nonStrikerRuns").innerText =
+                `${data.non_striker_runs ?? 0} (${data.non_striker_balls ?? 0})`;
+
+            document.getElementById("bowler").innerText = data.bowler || "No bowler";
+            document.getElementById("bowlWk").innerText = data.bowler_wickets ?? data.bowl_wickets ?? 0;
+        });
+}
+
+function updatePlayerStats() {
+    fetch("/player-stats-api/")
+        .then(res => res.json())
+        .then(data => {
+            const body = document.getElementById("playerStatsBody");
+            const rows = data.players || [];
+
+            body.innerHTML = rows.length
+                ? rows.map(player => `
+                    <tr>
+                        <td>${player.name}</td>
+                        <td>${player.runs}</td>
+                        <td>${player.balls}</td>
+                        <td>${player.strike_rate}</td>
+                    </tr>
+                `).join("")
+                : '<tr><td colspan="4">No player stats added yet.</td></tr>';
+        });
+}
+
+function updatePointsTable() {
+    fetch("/points-table-api/")
+        .then(res => res.json())
+        .then(data => {
+            const body = document.getElementById("pointsTableBody");
+            const rows = data.teams || [];
+
+            body.innerHTML = rows.length
+                ? rows.map(team => `
+                    <tr>
+                        <td>${team.team}</td>
+                        <td>${team.played}</td>
+                        <td>${team.won}</td>
+                        <td>${team.lost}</td>
+                        <td>${team.tied}</td>
+                        <td>${team.no_result}</td>
+                        <td>${team.points}</td>
+                        <td>${team.net_run_rate}</td>
+                    </tr>
+                `).join("")
+                : '<tr><td colspan="8">No points table entries yet.</td></tr>';
+        });
+}
+
+function updateOverData() {
+    fetch(`/over-data/${getMatchQuery()}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("overNo").innerText = data.over_no || 1;
+            document.getElementById("overTotal").innerText = data.total ?? 0;
+
+            let ballsHtml = "";
+            const balls = data.balls || [];
+            const legalBalls = data.legal_balls || 0;
+
+            if (balls.length > 0) {
+                balls.forEach(ball => {
+                    const ballText = String(ball);
+
+                    if (ballText === "W") {
+                        ballsHtml += `<span class="ball-item wicket-ball">${ballText}</span>`;
+                    } else if (
+                        ballText.startsWith("LB") ||
+                        ballText.startsWith("WD") ||
+                        ballText.startsWith("NB") ||
+                        ballText.startsWith("B")
+                    ) {
+                        ballsHtml += `<span class="ball-item extra-ball">${ballText}</span>`;
+                    } else {
+                        ballsHtml += `<span class="ball-item">${ballText}</span>`;
+                    }
+                });
+
+                // add empty balls up to 6 legal deliveries
+                const emptyCount = Math.max(0, 6 - legalBalls);
+                for (let i = 0; i < emptyCount; i++) {
+                    ballsHtml += `<span class="ball-item empty-ball"></span>`;
+                }
+
+                const latestBall = String(balls[balls.length - 1]);
+                if (lastBallEvent !== null && latestBall !== lastBallEvent) {
+                    playMatchSound(latestBall);
+                }
+                lastBallEvent = latestBall;
+            } else {
+                for (let i = 0; i < 6; i++) {
+                    ballsHtml += `<span class="ball-item empty-ball"></span>`;
+                }
+            }
+
+            document.getElementById("overBalls").innerHTML = ballsHtml;
+        });
+}
+
+function updateCommentary() {
+    fetch(`/commentary-api/${getMatchQuery()}`)
+        .then(res => res.json())
+        .then(data => {
+            const box = document.getElementById("commentaryBox");
+            const rows = data.commentary || [];
+
+            box.innerHTML = rows.length
+                ? rows.map(row => `
+                    <div class="commentary-line">
+                        <strong>${row.over_text}</strong> — ${row.text}
+                    </div>
+                `).join("")
+                : '<p class="commentary-line">No commentary yet.</p>';
+        });
+}
+
+function updateChart() {
+    if (!runsChart) return;
+
+    fetch(`/chart-data/${getMatchQuery()}`)
+        .then(res => res.json())
+        .then(data => {
+            runsChart.data.labels = Array.isArray(data.labels) ? data.labels : [];
+            runsChart.data.datasets[0].data = Array.isArray(data.first_innings_runs) ? data.first_innings_runs : [];
+            runsChart.data.datasets[1].data = Array.isArray(data.second_innings_runs) ? data.second_innings_runs : [];
+            runsChart.update();
+        });
+}
+
+function refreshAll() {
+    updateScoreboard();
+    updatePlayers();
+    updatePlayerStats();
+    updatePointsTable();
+    updateOverData();
+    updateCommentary();
+    updateChart();
+}
+
+createChart();
+refreshAll();
+setInterval(refreshAll, 2000);
+</script>
+</body>
+</html>

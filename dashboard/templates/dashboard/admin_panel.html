@@ -1,0 +1,639 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoring Control Panel</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+</head>
+<body>
+<div class="page-wrapper admin-page">
+    <header class="topbar">
+        <div class="logo">Match Admin Panel</div>
+        <div class="topbar-actions">
+            <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
+            <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+            <a href="{% url 'logout' %}" class="btn danger-btn">Logout</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Create Match</h3>
+                <p class="section-subtitle">Start a new game with opening players and full Playing XI.</p>
+            </div>
+
+            <form method="post" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create_match">
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Batting Team</label>
+                        <input type="text" name="team1" placeholder="Mumbai Indians" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Bowling Team</label>
+                        <input type="text" name="team2" placeholder="Royal Challengers Bangalore" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Opening Striker</label>
+                        <input type="text" name="batsman" placeholder="Rohit Sharma" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Opening Non-Striker</label>
+                        <input type="text" name="non_striker" placeholder="Ishan Kishan" required>
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label>Opening Bowler</label>
+                        <input type="text" name="bowler" placeholder="Mohammed Siraj" required>
+                    </div>
+                </div>
+
+                <div class="playing-xi-grid">
+                    <div class="glass-subcard">
+                        <h4 class="mini-card-title">Team 1 Playing XI</h4>
+                        <div class="playing-xi-inputs">
+                            {% for i in "12345678901"|make_list %}
+                            <input type="text" name="team1_players" placeholder="Team 1 Player {{ forloop.counter }}">
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="glass-subcard">
+                        <h4 class="mini-card-title">Team 2 Playing XI</h4>
+                        <div class="playing-xi-inputs">
+                            {% for i in "12345678901"|make_list %}
+                            <input type="text" name="team2_players" placeholder="Team 2 Player {{ forloop.counter }}">
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn primary-btn">Create Match</button>
+            </form>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Match Selector</h3>
+                <p class="section-subtitle">Pick the live match you want to run.</p>
+            </div>
+
+            <div class="quick-links">
+                {% for match in matches %}
+                    <a class="btn {% if selected_match and selected_match.id == match.id %}primary-btn{% else %}action-btn top-action-btn{% endif %}"
+                       href="/admin-panel/?match_id={{ match.id }}">
+                        {{ match.team1 }} vs {{ match.team2 }}
+                    </a>
+                {% empty %}
+                    <span class="section-subtitle">No matches created yet.</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if selected_match %}
+        <section class="glass-card">
+            <div class="match-header">
+                <div>
+                    <p class="match-label">ACTIVE MATCH</p>
+                    <h2 class="match-title">
+                        {{ selected_match.team1 }}
+                        <span class="vs-text">vs</span>
+                        {{ selected_match.team2 }}
+                    </h2>
+                </div>
+
+                <div class="status-pill">{{ selected_match.status }}</div>
+            </div>
+
+            <div class="match-admin-actions">
+                <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_match">
+                    <button
+                        type="submit"
+                        class="btn danger-btn"
+                        onclick="return confirm('Are you sure you want to delete this match?')">
+                        Delete Match
+                    </button>
+                </form>
+
+                <a href="{% url 'scorecard_page' %}?match_id={{ selected_match.id }}" class="btn primary-btn">
+                    View Scorecard
+                </a>
+            </div>
+
+            <div class="score-layout">
+                <div class="team-score-side">
+                    <p class="small-label">Score</p>
+                    <h3>{{ selected_match.runs }}/{{ selected_match.wickets }}</h3>
+                </div>
+
+                <div class="score-center">
+                    <div class="score-big">{{ selected_match.overs }}</div>
+                    <div class="overs-text">Overs</div>
+                </div>
+
+                <div class="team-score-side align-right">
+                    <p class="small-label">Result</p>
+                    <h3>{{ selected_match.result_text|default:"In play" }}</h3>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Playing XI</h3>
+                <p class="section-subtitle">Players available for batting, bowling, and scorecard selection.</p>
+            </div>
+
+            <div class="playing-xi-grid">
+                <div class="glass-subcard">
+                    <h4 class="mini-card-title">{{ selected_match.team1 }}</h4>
+                    <div class="xi-list">
+                        {% for p in team1_xi %}
+                            <div class="xi-item">{{ forloop.counter }}. {{ p.player_name }}</div>
+                        {% empty %}
+                            <div class="section-subtitle">No Playing XI saved.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="glass-subcard">
+                    <h4 class="mini-card-title">{{ selected_match.team2 }}</h4>
+                    <div class="xi-list">
+                        {% for p in team2_xi %}
+                            <div class="xi-item">{{ forloop.counter }}. {{ p.player_name }}</div>
+                        {% empty %}
+                            <div class="section-subtitle">No Playing XI saved.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% if players %}
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Update Current Players</h3>
+                <p class="section-subtitle">Choose striker, non-striker, and bowler from Playing XI.</p>
+            </div>
+
+            <form method="post" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_players">
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Striker</label>
+                        <select name="batsman">
+                            {% for p in batting_xi %}
+                            <option value="{{ p.player_name }}" {% if players.batsman == p.player_name %}selected{% endif %}>
+                                {{ p.player_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Non-Striker</label>
+                        <select name="non_striker">
+                            {% for p in batting_xi %}
+                            <option value="{{ p.player_name }}" {% if players.non_striker == p.player_name %}selected{% endif %}>
+                                {{ p.player_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Bowler</label>
+                        <select name="bowler">
+                            {% for p in bowling_xi %}
+                            <option value="{{ p.player_name }}" {% if players.bowler == p.player_name %}selected{% endif %}>
+                                {{ p.player_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Striker Runs</label>
+                        <input type="number" name="batsman_runs" value="{{ players.batsman_runs|default:0 }}" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Striker Balls</label>
+                        <input type="number" name="batsman_balls" value="{{ players.batsman_balls|default:0 }}" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Non-Striker Runs</label>
+                        <input type="number" name="non_striker_runs" value="{{ players.non_striker_runs|default:0 }}" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Non-Striker Balls</label>
+                        <input type="number" name="non_striker_balls" value="{{ players.non_striker_balls|default:0 }}" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Bowler Wickets</label>
+                        <input type="number" name="bowler_wickets" value="{{ players.bowler_wickets|default:0 }}" min="0">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn primary-btn">Update Players</button>
+            </form>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Live Batters & Bowler</h3>
+                <p class="section-subtitle">Quick preview of the current on-field players.</p>
+            </div>
+
+            <div class="summary-player-block three-col-summary">
+                <div class="summary-player">
+                    <div class="summary-avatar">🏏</div>
+                    <div>
+                        <div class="summary-small-label">Striker</div>
+                        <div class="summary-player-name">{{ players.batsman }}</div>
+                        <div class="summary-player-meta">{{ players.batsman_runs }} ({{ players.batsman_balls }})</div>
+                    </div>
+                </div>
+
+                <div class="summary-player">
+                    <div class="summary-avatar">🏏</div>
+                    <div>
+                        <div class="summary-small-label">Non-Striker</div>
+                        <div class="summary-player-name">{{ players.non_striker }}</div>
+                        <div class="summary-player-meta">{{ players.non_striker_runs }} ({{ players.non_striker_balls }})</div>
+                    </div>
+                </div>
+
+                <div class="summary-player">
+                    <div class="summary-avatar">🎯</div>
+                    <div>
+                        <div class="summary-small-label">Bowler</div>
+                        <div class="summary-player-name">{{ players.bowler }}</div>
+                        <div class="summary-player-meta">Wickets: {{ players.bowler_wickets }}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Ball Controls</h3>
+                <p class="section-subtitle">Run the match from here with singles, boundaries, wickets, wides, no-balls, byes, and leg-byes.</p>
+            </div>
+
+            <form method="post" action="/admin-panel/?match_id={{ selected_match.id }}" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="record_ball">
+                <input type="hidden" name="status" value="{{ selected_match.status }}">
+                <input type="hidden" name="runs" value="0">
+
+                <div class="form-grid" style="margin-bottom: 18px;">
+                    <div class="input-group">
+                        <label>Dismissal Type</label>
+                        <select name="dismissal_type">
+                            <option value="bowled">Bowled</option>
+                            <option value="caught">Caught Out</option>
+                            <option value="lbw">LBW</option>
+                            <option value="run_out">Run Out</option>
+                            <option value="stumped">Stumping</option>
+                            <option value="hit_wicket">Hit Wicket</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Fielder Name</label>
+                        <input type="text" name="fielder_name" placeholder="Fielder / Keeper name">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Next Batsman</label>
+                        <select name="next_batsman">
+                            <option value="">Select next batsman</option>
+                            {% for p in batting_xi %}
+                            <option value="{{ p.player_name }}">{{ p.player_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-grid control-grid-large">
+                    <button class="btn action-btn" type="submit" name="event_type" value="run" onclick="this.form.runs.value=0;">Dot Ball</button>
+                    <button class="btn action-btn" type="submit" name="event_type" value="run" onclick="this.form.runs.value=1;">1 Run</button>
+                    <button class="btn action-btn" type="submit" name="event_type" value="run" onclick="this.form.runs.value=2;">2 Runs</button>
+                    <button class="btn action-btn" type="submit" name="event_type" value="run" onclick="this.form.runs.value=3;">3 Runs</button>
+                    <button class="btn boundary-btn" type="submit" name="event_type" value="run" onclick="this.form.runs.value=4;">Four</button>
+                    <button class="btn six-btn" type="submit" name="event_type" value="run" onclick="this.form.runs.value=6;">Six</button>
+                    <button class="btn wicket-btn" type="submit" name="event_type" value="wicket" onclick="this.form.runs.value=0;">Wicket</button>
+                    <button class="btn extra-btn" type="submit" name="event_type" value="wide" onclick="this.form.runs.value=1;">Wide</button>
+                    <button class="btn extra-btn" type="submit" name="event_type" value="no_ball" onclick="this.form.runs.value=1;">No Ball</button>
+                    <button class="btn extra-btn" type="submit" name="event_type" value="leg_bye" onclick="this.form.runs.value=1;">Leg Bye</button>
+                    <button class="btn extra-btn" type="submit" name="event_type" value="bye" onclick="this.form.runs.value=1;">Bye</button>
+                </div>
+            </form>
+
+            <form method="post" action="/admin-panel/?match_id={{ selected_match.id }}" class="admin-form admin-subpanel">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="record_ball">
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="event-type">Custom Event</label>
+                        <select id="event-type" name="event_type">
+                            <option value="run">Runs</option>
+                            <option value="wide">Wide</option>
+                            <option value="no_ball">No Ball</option>
+                            <option value="leg_bye">Leg Bye</option>
+                            <option value="bye">Bye</option>
+                            <option value="wicket">Wicket</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="runs">Runs Value</label>
+                        <input id="runs" name="runs" type="number" min="0" max="7" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Dismissal Type</label>
+                        <select name="dismissal_type">
+                            <option value="bowled">Bowled</option>
+                            <option value="caught">Caught Out</option>
+                            <option value="lbw">LBW</option>
+                            <option value="run_out">Run Out</option>
+                            <option value="stumped">Stumping</option>
+                            <option value="hit_wicket">Hit Wicket</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Fielder Name</label>
+                        <input type="text" name="fielder_name" placeholder="Fielder / Keeper name">
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label for="status">Live Status</label>
+                        <input id="status" name="status" value="{{ selected_match.status }}">
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label>Next Batsman</label>
+                        <select name="next_batsman">
+                            <option value="">Select next batsman</option>
+                            {% for p in batting_xi %}
+                            <option value="{{ p.player_name }}">{{ p.player_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn primary-btn" type="submit">Add Custom Ball</button>
+            </form>
+
+            <form method="post" action="/admin-panel/?match_id={{ selected_match.id }}" class="admin-form admin-subpanel">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="undo_ball">
+                <button class="btn wicket-btn" type="submit">Undo Last Ball</button>
+            </form>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Player Stats Admin</h3>
+                <p class="section-subtitle">Add or update the player stats table shown on the dashboard.</p>
+            </div>
+
+            <form method="post" action="/admin-panel/?match_id={{ selected_match.id }}" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_player_stat">
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="stat-name">Player Name</label>
+                        <input id="stat-name" name="stat_name" placeholder="Virat Kohli" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="stat-team">Team</label>
+                        <input id="stat-team" name="stat_team" placeholder="RCB">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="stat-runs">Runs</label>
+                        <input id="stat-runs" name="stat_runs" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="stat-balls">Balls</label>
+                        <input id="stat-balls" name="stat_balls" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label for="stat-wickets">Wickets</label>
+                        <input id="stat-wickets" name="stat_wickets" type="number" min="0" value="0">
+                    </div>
+                </div>
+
+                <button class="btn primary-btn" type="submit">Save Player Stat</button>
+            </form>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Team</th>
+                            <th>Runs</th>
+                            <th>Balls</th>
+                            <th>SR</th>
+                            <th>Wkts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in player_stats %}
+                        <tr>
+                            <td>{{ stat.name }}</td>
+                            <td>{{ stat.team|default:"-" }}</td>
+                            <td>{{ stat.runs }}</td>
+                            <td>{{ stat.balls }}</td>
+                            <td>{{ stat.strike_rate }}</td>
+                            <td>{{ stat.wickets }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">No player stats yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Points Table Admin</h3>
+                <p class="section-subtitle">Control the standings table from the same admin page.</p>
+            </div>
+
+            <form method="post" action="/admin-panel/?match_id={{ selected_match.id }}" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_points_table">
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="points-team">Team</label>
+                        <input id="points-team" name="points_team" placeholder="KKR" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="played">Played</label>
+                        <input id="played" name="played" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="won">Won</label>
+                        <input id="won" name="won" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="lost">Lost</label>
+                        <input id="lost" name="lost" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="tied">Tied</label>
+                        <input id="tied" name="tied" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="no-result">No Result</label>
+                        <input id="no-result" name="no_result" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="points">Points</label>
+                        <input id="points" name="points" type="number" min="0" value="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="nrr">Net Run Rate</label>
+                        <input id="nrr" name="net_run_rate" type="number" step="0.01" value="0">
+                    </div>
+                </div>
+
+                <button class="btn primary-btn" type="submit">Save Points Row</button>
+            </form>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team</th>
+                            <th>P</th>
+                            <th>W</th>
+                            <th>L</th>
+                            <th>T</th>
+                            <th>NR</th>
+                            <th>Pts</th>
+                            <th>NRR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in points_table %}
+                        <tr>
+                            <td>{{ row.team }}</td>
+                            <td>{{ row.played }}</td>
+                            <td>{{ row.won }}</td>
+                            <td>{{ row.lost }}</td>
+                            <td>{{ row.tied }}</td>
+                            <td>{{ row.no_result }}</td>
+                            <td>{{ row.points }}</td>
+                            <td>{{ row.net_run_rate }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8">No points table rows yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Finish Match</h3>
+                <p class="section-subtitle">Close out the game and save the official result line.</p>
+            </div>
+
+            <form method="post" action="/admin-panel/?match_id={{ selected_match.id }}" class="admin-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="finish_match">
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="final-status">Status</label>
+                        <input id="final-status" name="status" value="Completed">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="result-text">Result</label>
+                        <input id="result-text" name="result_text" placeholder="MI won by 5 wickets">
+                    </div>
+                </div>
+
+                <button class="btn primary-btn" type="submit">Save Result</button>
+            </form>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Recent Ball History</h3>
+                <p class="section-subtitle">Most recent scoring events.</p>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Over</th>
+                            <th>Event</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ball in recent_balls %}
+                        <tr>
+                            <td>{{ ball.over_no }}</td>
+                            <td>{{ ball.event }}</td>
+                            <td>{{ ball.created_at|date:"H:i:s" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No deliveries recorded yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+</div>
+</body>
+</html>
