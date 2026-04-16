@@ -1661,3 +1661,108 @@ td[colspan] {
         gap: 6px !important;
     }
 }
+
+/* ===== GLOBAL MOBILE FIX (FINAL) ===== */
+@media (max-width: 768px) {
+
+    /* MAIN LAYOUT */
+    .main-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px;
+        padding: 10px;
+    }
+
+    .page-wrapper {
+        width: 100%;
+    }
+
+    /* BANNERS (KEEP BOTH) */
+    .side-banner {
+        width: 100%;
+        height: 150px;
+        min-height: 150px;
+        position: relative;
+        border-radius: 18px;
+    }
+
+    /* ALL CARDS */
+    .glass-card,
+    .hero-card {
+        padding: 16px !important;
+        border-radius: 20px;
+    }
+
+    /* ALL GRIDS → SINGLE COLUMN */
+    .score-layout,
+    .mobile-score-layout,
+    .players-grid,
+    .summary-grid,
+    .summary-player-block,
+    .summary-bottom-row,
+    .playing-xi-grid,
+    .stats-hero-grid,
+    .three-col-summary,
+    .form-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    /* CENTER EVERYTHING */
+    .team-score-side,
+    .summary-player,
+    .score-center,
+    .mobile-score-center,
+    .mini-stats,
+    .score-stats-block {
+        text-align: center !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* TEAM BOX FIX */
+    .team-box-with-logo,
+    .mobile-team-box,
+    .team-box-right {
+        justify-content: center !important;
+        width: 100%;
+    }
+
+    /* BIG SCORE */
+    .score-big {
+        font-size: 50px !important;
+        margin: 0 !important;
+    }
+
+    /* SUMMARY FIX */
+    .summary-player {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* BUTTON FULL WIDTH */
+    .btn {
+        width: 100%;
+    }
+
+    /* CHART FIX */
+    .chart-wrap {
+        height: 240px !important;
+    }
+
+    /* TABLE FIX (SCROLL) */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 520px;
+    }
+
+    /* COMMENTARY */
+    .commentary-line {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+}
