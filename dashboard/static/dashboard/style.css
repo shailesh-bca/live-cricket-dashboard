@@ -1766,3 +1766,111 @@ td[colspan] {
         line-height: 1.5;
     }
 }
+/* ===== SECTION-WISE MOBILE FIX ===== */
+.mobile-section-card {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .mobile-section-card {
+        padding: 16px !important;
+        border-radius: 20px !important;
+    }
+
+    .mobile-section-card .section-header {
+        margin-bottom: 14px;
+        text-align: center;
+    }
+
+    .mobile-section-card .neon {
+        font-size: 22px !important;
+        line-height: 1.2;
+    }
+
+    .mobile-section-card .section-subtitle {
+        font-size: 13px !important;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .summary-player-block,
+    .three-col-summary,
+    .summary-bottom-row {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .summary-player {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 10px !important;
+    }
+
+    .summary-main-card,
+    .summary-pom-card {
+        padding: 16px !important;
+    }
+
+    .mobile-over-summary {
+        text-align: center;
+    }
+
+    .mobile-over-summary .ball-list {
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .mobile-over-summary .ball-item {
+        width: 40px;
+        height: 40px;
+        font-size: 12px;
+    }
+
+    .mobile-commentary-box {
+        gap: 10px;
+    }
+
+    .mobile-commentary-box .commentary-line {
+        font-size: 13px;
+        line-height: 1.5;
+        padding: 10px 12px;
+    }
+
+    .mobile-chart-wrap {
+        height: 230px !important;
+    }
+
+    .mobile-table {
+        min-width: 520px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .stats-button-wrap .btn {
+        width: 100%;
+        max-width: 260px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-chart-wrap {
+        height: 210px !important;
+    }
+
+    .mobile-section-card .neon {
+        font-size: 20px !important;
+    }
+
+    .mobile-section-card .section-subtitle {
+        font-size: 12px !important;
+    }
+}
