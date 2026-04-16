@@ -58,6 +58,21 @@
                             </span>
                         </h2>
                     </div>
+                    {% if match %}
+    <!-- your current live dashboard content -->
+{% else %}
+    <section class="glass-card hero-card">
+        <div class="section-header">
+            <h3 class="neon">No Match Available</h3>
+            <p class="section-subtitle">Please log in to the admin panel and create a match first.</p>
+        </div>
+
+        <div class="quick-links" style="margin-top: 20px;">
+            <a href="{% url 'login' %}" class="btn primary-btn">Login</a>
+            <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+        </div>
+    </section>
+{% endif %}
 
                     <div class="status-pill" id="matchStatus">{{ match.status|default:"In Progress" }}</div>
                 </div>

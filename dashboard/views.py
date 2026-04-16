@@ -686,8 +686,22 @@ def index(request):
     matches = Match.objects.order_by("-created_at")
     selected_match = _get_selected_match(request.GET.get("match_id"))
 
-    team1_logo = _get_team_logo(selected_match.team1) if selected_match else "dashboard/images/teams/default.png"
-    team2_logo = _get_team_logo(selected_match.team2) if selected_match else "dashboard/images/teams/default.png"
+    if not selected_match:
+        return render(
+            request,
+            "dashboard/index.html",
+            {
+                "match": None,
+                "matches": matches,
+                "team1_logo": "dashboard/images/teams/default.png",
+                "team2_logo": "dashboard/images/teams/default.png",
+                "player_stats": PlayerStat.objects.order_by("-runs", "-wickets", "name")[:8],
+                "points_table": PointsTableEntry.objects.all()[:10],
+            },
+        )
+
+    team1_logo = _get_team_logo(selected_match.team1)
+    team2_logo = _get_team_logo(selected_match.team2)
 
     return render(
         request,

@@ -84,3 +84,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "admin_panel"
 LOGOUT_REDIRECT_URL = "login"
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+import os
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
