@@ -1624,3 +1624,40 @@ td[colspan] {
         line-height: 1.5;
     }
 }
+
+@media (max-width: 768px) {
+    .match-header-left {
+        width: 100%;
+    }
+
+    .match-title-with-logos {
+        justify-content: flex-start !important;
+    }
+
+    .mobile-score-layout {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .mobile-score-center {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        text-align: center !important;
+    }
+
+    .mobile-team-box {
+        justify-content: center !important;
+        width: 100%;
+    }
+
+    .score-stats-block {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+}

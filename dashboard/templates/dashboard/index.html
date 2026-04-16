@@ -29,7 +29,7 @@
 
             <section class="glass-card hero-card" id="liveMatchCard">
                 <div class="match-header">
-                    <div>
+                    <div class="match-header-left">
                         <p class="match-label">LIVE MATCH</p>
 
                         <h2 class="match-title match-title-with-logos">
@@ -64,10 +64,10 @@
                     <div class="status-pill" id="matchStatus">{{ match.status|default:"In Progress" }}</div>
                 </div>
 
-                <div class="score-layout">
-                    <div class="team-score-side">
+                <div class="score-layout mobile-score-layout">
+                    <div class="team-score-side batting-side">
                         <p class="small-label">Batting Team</p>
-                        <div class="team-box-with-logo">
+                        <div class="team-box-with-logo mobile-team-box">
                             <img
                                 src="{% static team1_logo %}"
                                 alt="{{ match.batting_team|default:match.team1 }}"
@@ -79,25 +79,22 @@
                         </div>
                     </div>
 
-                    <div class="score-center">
+                    <div class="score-center mobile-score-center">
                         <div id="score1" class="score-big">{{ match.runs|default:0 }}/{{ match.wickets|default:0 }}</div>
                         <div class="overs-text">Overs: <span id="overs">{{ match.overs|default:"0.0" }}</span></div>
 
                         <div id="winnerBanner" class="winner-banner" style="display:none;"></div>
 
-                        <div class="mini-stats">
+                        <div class="mini-stats score-stats-block">
                             <span>CRR: <strong id="runrate">0.00</strong></span>
                             <span>Status: <strong id="resultText">{{ match.result_text|default:"Live" }}</strong></span>
-                        </div>
-
-                        <div class="mini-stats" style="margin-top:10px;">
                             <span>Win Probability: <strong id="winProbability">50%</strong></span>
                         </div>
                     </div>
 
-                    <div class="team-score-side align-right">
+                    <div class="team-score-side align-right bowling-side">
                         <p class="small-label">Bowling Team</p>
-                        <div class="team-box-with-logo team-box-right">
+                        <div class="team-box-with-logo team-box-right mobile-team-box">
                             <img
                                 src="{% static team2_logo %}"
                                 alt="{{ match.bowling_team|default:match.team2 }}"
@@ -446,8 +443,11 @@ function createChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
+                    position: "top",
                     labels: {
-                        color: "#ffffff"
+                        color: "#ffffff",
+                        boxWidth: 28,
+                        padding: 14
                     }
                 }
             },
