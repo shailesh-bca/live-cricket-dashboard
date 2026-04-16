@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+import os
+from django.contrib.auth.models import User
 
 from .models import (
     BallHistory,
@@ -42,6 +44,21 @@ TEAM_LOGO_MAP = {
 BALLS_PER_OVER = 6
 MAX_OVERS = 20
 MAX_WICKETS = 10
+
+def _ensure_render_admin():
+    username = os.environ.get("ADMIN_USERNAME")
+    password = os.environ.get("ADMIN_PASSWORD")
+    email = os.environ.get("ADMIN_EMAIL", "")
+
+    if not username or not password:
+        return
+
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password,
+        )
 
 
 def _get_team_logo(team_name):
@@ -718,6 +735,8 @@ def index(request):
 
 
 def login_view(request):
+    _ensure_render_admin()
+
     if request.user.is_authenticated:
         return redirect("admin_panel")
 
