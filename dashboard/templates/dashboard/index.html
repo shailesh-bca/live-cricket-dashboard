@@ -17,14 +17,16 @@
         <header class="topbar">
             <div class="logo">Live Cricket Dashboard</div>
             <div class="topbar-actions">
-              <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
-              <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
-              <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
-            <div class="live-badge blink">LIVE</div>
-         </div>
+                <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+                <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
+                <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+                <div class="live-badge blink">LIVE</div>
+            </div>
         </header>
 
         <main class="live-dashboard">
+            {% if match %}
+
             <section class="glass-card hero-card" id="liveMatchCard">
                 <div class="match-header">
                     <div>
@@ -58,21 +60,6 @@
                             </span>
                         </h2>
                     </div>
-                    {% if match %}
-    <!-- your current live dashboard content -->
-                 {% else %}
-                         <section class="glass-card hero-card">
-            <div class="section-header">
-            <h3 class="neon">No Match Available</h3>
-            <p class="section-subtitle">Please log in to the admin panel and create a match first.</p>
-        </div>
-
-        <div class="quick-links" style="margin-top: 20px;">
-            <a href="{% url 'login' %}" class="btn primary-btn">Login</a>
-            <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
-        </div>
-    </section>
-{% endif %}
 
                     <div class="status-pill" id="matchStatus">{{ match.status|default:"In Progress" }}</div>
                 </div>
@@ -125,73 +112,73 @@
             </section>
 
             <section class="glass-card">
-    <div class="section-header">
-        <h3 class="neon">Match Summary</h3>
-        <p class="section-subtitle">Live batting partnership, bowler figures, and player of the match.</p>
-    </div>
-
-    <div class="summary-grid">
-        <div class="summary-main-card">
-            <div class="summary-player-block three-col-summary">
-    <div class="summary-player">
-        <div class="summary-avatar">🏏</div>
-        <div>
-            <div class="summary-small-label">Striker</div>
-            <div class="summary-player-name" id="batsman">Striker</div>
-            <div class="summary-player-meta">
-                <span id="batRuns">0 (0)</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="summary-player">
-        <div class="summary-avatar">🏏</div>
-        <div>
-            <div class="summary-small-label">Non-Striker</div>
-            <div class="summary-player-name" id="nonStriker">Non-Striker</div>
-            <div class="summary-player-meta">
-                <span id="nonStrikerRuns">0 (0)</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="summary-player">
-        <div class="summary-avatar">🎯</div>
-        <div>
-            <div class="summary-small-label">Bowler</div>
-            <div class="summary-player-name" id="bowler">Bowler</div>
-            <div class="summary-player-meta">
-                Wickets: <span id="bowlWk">0</span>
-            </div>
-        </div>
-    </div>
-</div>
-
-            <div class="summary-bottom-row">
-                <div class="summary-chip">
-                    Partnership: <strong id="partnershipText">0 (0)</strong>
+                <div class="section-header">
+                    <h3 class="neon">Match Summary</h3>
+                    <p class="section-subtitle">Live batting partnership, bowler figures, and player of the match.</p>
                 </div>
-                <div class="summary-chip">
-                    Last Wicket: <strong id="lastWicketText">None</strong>
+
+                <div class="summary-grid">
+                    <div class="summary-main-card">
+                        <div class="summary-player-block three-col-summary">
+                            <div class="summary-player">
+                                <div class="summary-avatar">🏏</div>
+                                <div>
+                                    <div class="summary-small-label">Striker</div>
+                                    <div class="summary-player-name" id="batsman">Striker</div>
+                                    <div class="summary-player-meta">
+                                        <span id="batRuns">0 (0)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="summary-player">
+                                <div class="summary-avatar">🏏</div>
+                                <div>
+                                    <div class="summary-small-label">Non-Striker</div>
+                                    <div class="summary-player-name" id="nonStriker">Non-Striker</div>
+                                    <div class="summary-player-meta">
+                                        <span id="nonStrikerRuns">0 (0)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="summary-player">
+                                <div class="summary-avatar">🎯</div>
+                                <div>
+                                    <div class="summary-small-label">Bowler</div>
+                                    <div class="summary-player-name" id="bowler">Bowler</div>
+                                    <div class="summary-player-meta">
+                                        Wickets: <span id="bowlWk">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="summary-bottom-row">
+                            <div class="summary-chip">
+                                Partnership: <strong id="partnershipText">0 (0)</strong>
+                            </div>
+                            <div class="summary-chip">
+                                Last Wicket: <strong id="lastWicketText">None</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-pom-card" id="playerOfMatchCard" style="display:none;">
+                        <div class="pom-title">Player of the Match</div>
+                        <div class="pom-avatar">⭐</div>
+                        <div class="pom-name" id="pomName">-</div>
+                        <div class="pom-team" id="pomTeam">-</div>
+                        <div class="pom-figures" id="pomFigures">-</div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="summary-pom-card" id="playerOfMatchCard" style="display:none;">
-            <div class="pom-title">Player of the Match</div>
-            <div class="pom-avatar">⭐</div>
-            <div class="pom-name" id="pomName">-</div>
-            <div class="pom-team" id="pomTeam">-</div>
-            <div class="pom-figures" id="pomFigures">-</div>
-        </div>
-    </div>
-
-    <div class="stats-button-wrap">
-        <a href="{% url 'scorecard_page' %}?match_id={{ match.id }}" class="btn primary-btn">
-            View Scorecard
-        </a>
-    </div>
-</section>
+                <div class="stats-button-wrap">
+                    <a href="{% url 'scorecard_page' %}?match_id={{ match.id }}" class="btn primary-btn">
+                        View Scorecard
+                    </a>
+                </div>
+            </section>
 
             <section class="glass-card">
                 <div class="section-header">
@@ -305,6 +292,22 @@
                     </table>
                 </div>
             </section>
+
+            {% else %}
+
+            <section class="glass-card hero-card">
+                <div class="section-header">
+                    <h3 class="neon">No Match Available</h3>
+                    <p class="section-subtitle">Please create a match from the admin panel first.</p>
+                </div>
+
+                <div class="quick-links" style="margin-top: 20px;">
+                    <a href="{% url 'admin_panel' %}" class="btn primary-btn">Go to Admin Panel</a>
+                    <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
+                </div>
+            </section>
+
+            {% endif %}
         </main>
     </div>
 
@@ -313,6 +316,7 @@
     </aside>
 </div>
 
+{% if match %}
 <audio id="wicketSound" src="{% static 'dashboard/sounds/wicket.mp3' %}"></audio>
 <audio id="sixSound" src="{% static 'dashboard/sounds/six.mp3' %}"></audio>
 <audio id="fourSound" src="{% static 'dashboard/sounds/four.mp3' %}"></audio>
@@ -353,7 +357,6 @@ function getLogoPath(teamName) {
         "Lucknow Super Giants": STATIC_BASE + "lsg.png",
         "Gujarat Titans": STATIC_BASE + "gt.png"
     };
-
     return logos[teamName] || (STATIC_BASE + "default.png");
 }
 
@@ -381,7 +384,6 @@ function normalizeTeamClass(teamName) {
         "GT": "team-gt",
         "Gujarat Titans": "team-gt"
     };
-
     return map[teamName] || "";
 }
 
@@ -540,26 +542,26 @@ function updateScoreboard() {
                 winnerBanner.style.display = "none";
                 winnerBanner.innerText = "";
             }
-            
+
             document.getElementById("partnershipText").innerText =
-           `${data.partnership_runs ?? 0} (${data.partnership_balls ?? 0})`;
+                `${data.partnership_runs ?? 0} (${data.partnership_balls ?? 0})`;
 
             document.getElementById("lastWicketText").innerText =
-              data.last_wicket_text || "None";
+                data.last_wicket_text || "None";
 
-           const pomCard = document.getElementById("playerOfMatchCard");
-          const pomName = document.getElementById("pomName");
-          const pomTeam = document.getElementById("pomTeam");
-         const pomFigures = document.getElementById("pomFigures");
+            const pomCard = document.getElementById("playerOfMatchCard");
+            const pomName = document.getElementById("pomName");
+            const pomTeam = document.getElementById("pomTeam");
+            const pomFigures = document.getElementById("pomFigures");
 
-      if ((data.status || "").toLowerCase() === "completed" && data.player_of_match) {
-          pomCard.style.display = "block";
-          pomName.innerText = data.player_of_match;
-         pomTeam.innerText = data.player_of_match_team || "-";
-         pomFigures.innerText = data.player_of_match_figures || "-";
-}      else {
-       pomCard.style.display = "none";
-}
+            if ((data.status || "").toLowerCase() === "completed" && data.player_of_match) {
+                pomCard.style.display = "block";
+                pomName.innerText = data.player_of_match;
+                pomTeam.innerText = data.player_of_match_team || "-";
+                pomFigures.innerText = data.player_of_match_figures || "-";
+            } else {
+                pomCard.style.display = "none";
+            }
         });
 }
 
@@ -652,7 +654,6 @@ function updateOverData() {
                     }
                 });
 
-                // add empty balls up to 6 legal deliveries
                 const emptyCount = Math.max(0, 6 - legalBalls);
                 for (let i = 0; i < emptyCount; i++) {
                     ballsHtml += `<span class="ball-item empty-ball"></span>`;
@@ -717,5 +718,6 @@ createChart();
 refreshAll();
 setInterval(refreshAll, 2000);
 </script>
+{% endif %}
 </body>
 </html>
