@@ -2171,3 +2171,6 @@ td[colspan] {
         padding: 14px;
     }
 }
+ body {
+    border: 8px solid red !important;
+}
