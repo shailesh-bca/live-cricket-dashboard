@@ -789,20 +789,20 @@ def admin_panel(request):
             return redirect("/admin-panel/")
 
         elif selected_match:
-    if action == "update_players":
-        _update_players(selected_match, request)
-    elif action == "record_ball":
-        _record_ball(selected_match, request)
-    elif action == "undo_ball":
-        _undo_last_ball(selected_match)
-    elif action == "edit_scorecard":
-        _edit_scorecard_entry(selected_match, request)
-    elif action == "finish_match":
-        selected_match.status = request.POST.get("status", "Completed")
-        selected_match.result_text = request.POST.get("result_text", "").strip()
-        selected_match.save()
-        if selected_match.status == "Completed":
-            _assign_player_of_match(selected_match)
+             if action == "update_players":
+                  _update_players(selected_match, request)
+             elif action == "record_ball":
+                _record_ball(selected_match, request)
+             elif action == "undo_ball":
+                _undo_last_ball(selected_match)
+            elif action == "edit_scorecard":
+               _edit_scorecard_entry(selected_match, request)
+            elif action == "finish_match":
+               selected_match.status = request.POST.get("status", "Completed")
+               selected_match.result_text = request.POST.get("result_text", "").strip()
+               selected_match.save()
+               if selected_match.status == "Completed":
+                  _assign_player_of_match(selected_match)
 
         if action == "update_player_stat":
             _update_player_stat(request)
