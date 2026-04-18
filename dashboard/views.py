@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import os
-from django.contrib.auth.models import User
 
 from .models import (
     BallHistory,
@@ -44,6 +44,7 @@ TEAM_LOGO_MAP = {
 BALLS_PER_OVER = 6
 MAX_OVERS = 20
 MAX_WICKETS = 10
+
 
 def _ensure_render_admin():
     username = os.environ.get("ADMIN_USERNAME")
@@ -376,22 +377,7 @@ def _update_points_table(request):
     team = request.POST.get("points_team", "").strip()
     if not team:
         return
-    
-    points = [
-    {
-        "team": p.team,
-        "played": p.played,
-        "won": p.won,
-        "lost": p.lost,
-        "tied": p.tied,
-        "no_result": p.no_result,
-        "points": p.points,
-        "net_run_rate": p.net_run_rate,
-        "logo": _get_team_logo(p.team),
-    }
-    for p in PointsTableEntry.objects.all().order_by('-points')
-]
-    
+
     PointsTableEntry.objects.update_or_create(
         team=team,
         defaults={
@@ -404,6 +390,34 @@ def _update_points_table(request):
             "net_run_rate": _to_float(request.POST.get("net_run_rate")),
         },
     )
+
+
+def _edit_scorecard_entry(match, request):
+    innings = _to_int(request.POST.get("innings"), 1)
+    player_name = request.POST.get("player_name", "").strip()
+
+    if not player_name:
+        return
+
+    entry = ScorecardEntry.objects.filter(
+        match=match,
+        innings=innings,
+        player_name=player_name,
+    ).first()
+
+    if not entry:
+        return
+
+    entry.runs = _to_int(request.POST.get("runs"), entry.runs)
+    entry.balls = _to_int(request.POST.get("balls"), entry.balls)
+    entry.fours = _to_int(request.POST.get("fours"), entry.fours)
+    entry.sixes = _to_int(request.POST.get("sixes"), entry.sixes)
+    entry.wicket_info = request.POST.get("wicket_info", entry.wicket_info).strip()
+    entry.dismissal_type = request.POST.get("dismissal_type", entry.dismissal_type).strip()
+    entry.fielder_name = request.POST.get("fielder_name", entry.fielder_name).strip()
+    entry.is_out = bool(entry.wicket_info and entry.wicket_info.upper() != "NOT OUT")
+
+    _update_scorecard_strike_rate(entry)
 
 
 def _start_second_innings(match):
@@ -558,7 +572,6 @@ def _record_ball(match, request):
         _update_scorecard_strike_rate(striker_entry)
 
         ball_event = str(run_value)
-
         match.partnership_runs += run_value
         match.partnership_balls += 1
 
@@ -585,7 +598,6 @@ def _record_ball(match, request):
         _update_scorecard_strike_rate(striker_entry)
 
         ball_event = "W"
-
         match.last_wicket_text = f"{striker_name_before} {striker_runs_before}({striker_balls_before + 1})"
         match.partnership_runs = 0
         match.partnership_balls = 0
@@ -788,32 +800,33 @@ def admin_panel(request):
             selected_match.delete()
             return redirect("/admin-panel/")
 
-elif selected_match:
-    if action == "update_players":
-        _update_players(selected_match, request)
+        elif selected_match:
+            if action == "update_players":
+                _update_players(selected_match, request)
 
-    elif action == "record_ball":
-        _record_ball(selected_match, request)
+            elif action == "record_ball":
+                _record_ball(selected_match, request)
 
-    elif action == "undo_ball":
-        _undo_last_ball(selected_match)
+            elif action == "undo_ball":
+                _undo_last_ball(selected_match)
 
-    elif action == "edit_scorecard":
-        _edit_scorecard_entry(selected_match, request)
+            elif action == "edit_scorecard":
+                _edit_scorecard_entry(selected_match, request)
 
-    elif action == "finish_match":
-        selected_match.status = request.POST.get("status", "Completed")
-        selected_match.result_text = request.POST.get("result_text", "").strip()
-        selected_match.save()
+            elif action == "finish_match":
+                selected_match.status = request.POST.get("status", "Completed")
+                selected_match.result_text = request.POST.get("result_text", "").strip()
+                selected_match.save()
 
-        if selected_match.status == "Completed":
-            _assign_player_of_match(selected_match)
+                if selected_match.status == "Completed":
+                    _assign_player_of_match(selected_match)
 
-    elif action == "update_player_stat":
-        _update_player_stat(request)
+            elif action == "update_player_stat":
+                _update_player_stat(request)
 
-    elif action == "update_points_table":
-        _update_points_table(request)
+            elif action == "update_points_table":
+                _update_points_table(request)
+
         if selected_match:
             return redirect(f"/admin-panel/?match_id={selected_match.id}")
         return redirect("/admin-panel/")
@@ -845,19 +858,19 @@ elif selected_match:
             "recent_commentary": recent_commentary,
             "player_stats": PlayerStat.objects.order_by("-runs", "-wickets", "name")[:10],
             "points_table": [
-         {
-        "team": row.team,
-        "played": row.played,
-        "won": row.won,
-        "lost": row.lost,
-        "tied": row.tied,
-        "no_result": row.no_result,
-        "points": row.points,
-        "net_run_rate": row.net_run_rate,
-        "logo": _get_team_logo(row.team),
-        }
-          for row in PointsTableEntry.objects.all().order_by("-points", "-net_run_rate", "team")[:10]
-        ],
+                {
+                    "team": row.team,
+                    "played": row.played,
+                    "won": row.won,
+                    "lost": row.lost,
+                    "tied": row.tied,
+                    "no_result": row.no_result,
+                    "points": row.points,
+                    "net_run_rate": row.net_run_rate,
+                    "logo": _get_team_logo(row.team),
+                }
+                for row in PointsTableEntry.objects.all().order_by("-points", "-net_run_rate", "team")[:10]
+            ],
             "batting_xi": batting_xi,
             "bowling_xi": bowling_xi,
             "team1_xi": team1_xi,
@@ -1170,6 +1183,7 @@ def points_table_page(request):
         {"points_table": rows},
     )
 
+
 def scorecard_page(request):
     match = _get_selected_match(request.GET.get("match_id"))
 
@@ -1203,6 +1217,7 @@ def scorecard_page(request):
             "second_innings_scorecard": second_innings_scorecard,
         },
     )
+
 
 @login_required
 def edit_scorecard_page(request):
