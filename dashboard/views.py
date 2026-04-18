@@ -377,10 +377,20 @@ def _update_points_table(request):
     if not team:
         return
     
-    points = PointsTableEntry.objects.all().order_by('-points')
-
-    for p in points:
-    p.logo = _get_team_logo(p.team)
+    points = [
+    {
+        "team": p.team,
+        "played": p.played,
+        "won": p.won,
+        "lost": p.lost,
+        "tied": p.tied,
+        "no_result": p.no_result,
+        "points": p.points,
+        "net_run_rate": p.net_run_rate,
+        "logo": _get_team_logo(p.team),
+    }
+    for p in PointsTableEntry.objects.all().order_by('-points')
+]
     
     PointsTableEntry.objects.update_or_create(
         team=team,
