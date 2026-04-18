@@ -614,7 +614,10 @@ function updatePointsTable() {
             body.innerHTML = rows.length
                 ? rows.map(team => `
                     <tr>
-                        <td>${team.team}</td>
+                        <td class="team-name-cell">
+                      <img src="/static/${team.logo}" alt="${team.team}" class="table-team-logo">
+                     <span>${team.team}</span>
+                     </td>
                         <td>${team.played}</td>
                         <td>${team.won}</td>
                         <td>${team.lost}</td>
