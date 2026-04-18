@@ -1929,3 +1929,245 @@ td[colspan] {
         background: rgba(255, 255, 255, 0.03);
     }
 }
+
+/* ===== SCORECARD MOBILE FIX ===== */
+.scorecard-table-wrap,
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scorecard-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+.scorecard-table th,
+.scorecard-table td {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .scorecard-page .glass-card,
+    .scorecard-page .hero-card,
+    .scorecard-page .section-card {
+        padding: 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .scorecard-page .topbar-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    .scorecard-page .btn {
+        width: 100%;
+    }
+
+    .scorecard-page .section-title,
+    .scorecard-page .neon {
+        font-size: 22px !important;
+    }
+
+    .scorecard-page .inning-summary-card,
+    .scorecard-page .match-summary-card {
+        padding: 14px !important;
+    }
+
+    .scorecard-page table {
+        min-width: 760px !important;
+    }
+}
+
+
+/* ===== FINAL SCORECARD MOBILE FIX ===== */
+.scorecard-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scorecard-table {
+    min-width: 720px;
+}
+
+.scorecard-table th,
+.scorecard-table td {
+    white-space: nowrap;
+}
+
+/* Improve mobile readability */
+@media (max-width: 768px) {
+    .scorecard-page {
+        padding: 10px !important;
+    }
+
+    .scorecard-page .glass-card {
+        padding: 16px !important;
+    }
+
+    .scorecard-page .innings-switcher {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .scorecard-page .innings-pill {
+        width: 100%;
+        text-align: center;
+    }
+}
+.table-team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.team-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ===== SCORECARD PAGE FIX ===== */
+.scorecard-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.scorecard-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 18px;
+}
+
+.scorecard-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+.scorecard-table th,
+.scorecard-table td {
+    white-space: nowrap;
+}
+
+/* TEAM LOGO TABLE CELL */
+.table-team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.team-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* SCORECARD MOBILE */
+@media (max-width: 768px) {
+    .scorecard-page {
+        padding: 10px !important;
+    }
+
+    .scorecard-page .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .scorecard-page .topbar-actions {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        width: 100%;
+    }
+
+    .scorecard-page .topbar-actions .btn {
+        width: 100%;
+    }
+
+    .scorecard-page .mobile-section-card {
+        padding: 16px !important;
+        border-radius: 20px !important;
+    }
+
+    .scorecard-page .section-header {
+        text-align: center;
+        margin-bottom: 14px;
+    }
+
+    .scorecard-page .neon {
+        font-size: 22px !important;
+        line-height: 1.2;
+    }
+
+    .scorecard-page .section-subtitle {
+        font-size: 13px !important;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    .scorecard-page .innings-switcher {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .scorecard-page .innings-pill {
+        width: 100%;
+        text-align: center;
+    }
+
+    .scorecard-table {
+        min-width: 760px !important;
+    }
+
+    .scorecard-table th,
+    .scorecard-table td {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .match-admin-actions {
+        flex-direction: column;
+    }
+
+    .match-admin-actions .btn,
+    .match-admin-actions .inline-form {
+        width: 100%;
+    }
+
+    .match-admin-actions .inline-form button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .scorecard-page .neon {
+        font-size: 20px !important;
+    }
+
+    .scorecard-page .section-subtitle {
+        font-size: 12px !important;
+    }
+
+    .scorecard-page .mobile-section-card {
+        padding: 14px !important;
+    }
+
+    .scorecard-table th,
+    .scorecard-table td {
+        font-size: 13px;
+        padding: 11px 12px;
+    }
+
+    .table-team-logo {
+        width: 24px;
+        height: 24px;
+    }
+}

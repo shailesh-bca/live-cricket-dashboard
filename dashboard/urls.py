@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    
+
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
@@ -12,6 +12,9 @@ urlpatterns = [
     path('player-stats/', views.player_stats_page, name='player_stats_page'),
     path('points-table/', views.points_table_page, name='points_table_page'),
     path('scorecard/', views.scorecard_page, name='scorecard_page'),
+
+    # optional dedicated editor page
+    path('edit-scorecard/', views.edit_scorecard_page, name='edit_scorecard_page'),
 
     path('get-score/', views.get_score, name='get_score'),
     path('players-api/', views.players_api, name='players_api'),

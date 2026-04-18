@@ -271,7 +271,10 @@
                         <tbody id="pointsTableBody">
                             {% for row in points_table %}
                             <tr>
-                                <td>{{ row.team }}</td>
+                                <td class="team-name-cell">
+    <img src="{% static row.logo %}" alt="{{ row.team }}" class="table-team-logo">
+    <span>{{ row.team }}</span>
+</td>
                                 <td>{{ row.played }}</td>
                                 <td>{{ row.won }}</td>
                                 <td>{{ row.lost }}</td>
