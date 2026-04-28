@@ -7,54 +7,51 @@
     <title>Live Cricket Dashboard</title>
     <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
 </head>
+
 <body>
 <div class="main-layout">
+
     <aside class="side-banner left-banner">
         <img src="{% static 'dashboard/images/left-player.png' %}" alt="Left Cricketer">
     </aside>
 
     <div class="page-wrapper">
+
         <header class="topbar">
-            <div class="logo">Live Cricket Dashboard</div>
+            <div class="logo">🏏 Live Cricket Dashboard</div>
+
             <div class="topbar-actions">
                 <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
                 <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
                 <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+                <button onclick="toggleTheme()" class="theme-btn" id="themeBtn">🌙 Dark</button>
                 <div class="live-badge blink">LIVE</div>
             </div>
         </header>
 
         <main class="live-dashboard">
+
             {% if match %}
 
+            <!-- HERO SCORE CARD -->
             <section class="glass-card hero-card" id="liveMatchCard">
                 <div class="match-header">
-                    <div class="match-header-left">
+                    <div>
                         <p class="match-label">LIVE MATCH</p>
 
                         <h2 class="match-title match-title-with-logos">
-                            <span class="team-with-logo" id="team1Wrap">
-                                <img
-                                    src="{% static team1_logo %}"
-                                    alt="{{ match.team1 }}"
-                                    class="team-logo"
-                                    id="team1Logo"
-                                    onerror="this.src='/static/dashboard/images/teams/default.png'"
-                                >
+                            <span class="team-with-logo">
+                                <img src="{% static team1_logo %}" alt="{{ match.team1 }}" class="team-logo" id="team1Logo"
+                                     onerror="this.src='/static/dashboard/images/teams/default.png'">
                                 <span id="team1">{{ match.team1|default:"Team A" }}</span>
                                 <span id="team1Winner" class="winner-badge" style="display:none;">🏆 Winner</span>
                             </span>
 
                             <span class="vs-text">vs</span>
 
-                            <span class="team-with-logo" id="team2Wrap">
-                                <img
-                                    src="{% static team2_logo %}"
-                                    alt="{{ match.team2 }}"
-                                    class="team-logo"
-                                    id="team2Logo"
-                                    onerror="this.src='/static/dashboard/images/teams/default.png'"
-                                >
+                            <span class="team-with-logo">
+                                <img src="{% static team2_logo %}" alt="{{ match.team2 }}" class="team-logo" id="team2Logo"
+                                     onerror="this.src='/static/dashboard/images/teams/default.png'">
                                 <span id="team2">{{ match.team2|default:"Team B" }}</span>
                                 <span id="team2Winner" class="winner-badge" style="display:none;">🏆 Winner</span>
                             </span>
@@ -64,22 +61,19 @@
                     <div class="status-pill" id="matchStatus">{{ match.status|default:"In Progress" }}</div>
                 </div>
 
-                <div class="score-layout mobile-score-layout">
-                    <div class="team-score-side batting-side">
+                
+               <div id="loadingText">Loading live match...</div>
+                <div class="score-layout">
+                    <div class="team-score-side">
                         <p class="small-label">Batting Team</p>
-                        <div class="team-box-with-logo mobile-team-box">
-                            <img
-                                src="{% static team1_logo %}"
-                                alt="{{ match.batting_team|default:match.team1 }}"
-                                class="team-logo side-team-logo"
-                                id="battingTeamLogo"
-                                onerror="this.src='/static/dashboard/images/teams/default.png'"
-                            >
+                        <div class="team-box-with-logo">
+                            <img src="{% static team1_logo %}" class="team-logo side-team-logo" id="battingTeamLogo"
+                                 onerror="this.src='/static/dashboard/images/teams/default.png'">
                             <h3 id="team1Side">{{ match.batting_team|default:match.team1|default:"Team A" }}</h3>
                         </div>
                     </div>
 
-                    <div class="score-center mobile-score-center">
+                    <div class="score-center">
                         <div id="score1" class="score-big">{{ match.runs|default:0 }}/{{ match.wickets|default:0 }}</div>
                         <div class="overs-text">Overs: <span id="overs">{{ match.overs|default:"0.0" }}</span></div>
 
@@ -90,25 +84,27 @@
                             <span>Status: <strong id="resultText">{{ match.result_text|default:"Live" }}</strong></span>
                             <span>Win Probability: <strong id="winProbability">50%</strong></span>
                         </div>
+
+                        <div class="mini-stats score-stats-block extra-live-info">
+                            <span>Target: <strong id="target">{{ match.target|default:0 }}</strong></span>
+                            <span>Innings: <strong id="innings">{{ match.innings|default:1 }}</strong></span>
+                            <span>API: <strong id="apiMode">Local</strong></span>
+                        </div>
                     </div>
 
-                    <div class="team-score-side align-right bowling-side">
+                    <div class="team-score-side align-right">
                         <p class="small-label">Bowling Team</p>
-                        <div class="team-box-with-logo team-box-right mobile-team-box">
-                            <img
-                                src="{% static team2_logo %}"
-                                alt="{{ match.bowling_team|default:match.team2 }}"
-                                class="team-logo side-team-logo"
-                                id="bowlingTeamLogo"
-                                onerror="this.src='/static/dashboard/images/teams/default.png'"
-                            >
+                        <div class="team-box-with-logo team-box-right">
+                            <img src="{% static team2_logo %}" class="team-logo side-team-logo" id="bowlingTeamLogo"
+                                 onerror="this.src='/static/dashboard/images/teams/default.png'">
                             <h3 id="team2Side">{{ match.bowling_team|default:match.team2|default:"Team B" }}</h3>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="glass-card mobile-section-card">
+            <!-- MATCH SUMMARY -->
+            <section class="glass-card">
                 <div class="section-header">
                     <h3 class="neon">Match Summary</h3>
                     <p class="section-subtitle">Live batting partnership, bowler figures, and player of the match.</p>
@@ -117,14 +113,13 @@
                 <div class="summary-grid">
                     <div class="summary-main-card">
                         <div class="summary-player-block three-col-summary">
+
                             <div class="summary-player">
                                 <div class="summary-avatar">🏏</div>
                                 <div>
                                     <div class="summary-small-label">Striker</div>
                                     <div class="summary-player-name" id="batsman">Striker</div>
-                                    <div class="summary-player-meta">
-                                        <span id="batRuns">0 (0)</span>
-                                    </div>
+                                    <div class="summary-player-meta"><span id="batRuns">0 (0)</span></div>
                                 </div>
                             </div>
 
@@ -133,9 +128,7 @@
                                 <div>
                                     <div class="summary-small-label">Non-Striker</div>
                                     <div class="summary-player-name" id="nonStriker">Non-Striker</div>
-                                    <div class="summary-player-meta">
-                                        <span id="nonStrikerRuns">0 (0)</span>
-                                    </div>
+                                    <div class="summary-player-meta"><span id="nonStrikerRuns">0 (0)</span></div>
                                 </div>
                             </div>
 
@@ -144,11 +137,10 @@
                                 <div>
                                     <div class="summary-small-label">Bowler</div>
                                     <div class="summary-player-name" id="bowler">Bowler</div>
-                                    <div class="summary-player-meta">
-                                        Wickets: <span id="bowlWk">0</span>
-                                    </div>
+                                    <div class="summary-player-meta">Wickets: <span id="bowlWk">0</span></div>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="summary-bottom-row">
@@ -177,14 +169,15 @@
                 </div>
             </section>
 
-            <section class="glass-card mobile-section-card">
+            <!-- PLAYER STATS -->
+            <section class="glass-card">
                 <div class="section-header">
                     <h3 class="neon">Player Stats</h3>
-                    <p class="section-subtitle">Batting and wicket snapshots below the current players.</p>
+                    <p class="section-subtitle">Quick batting leaderboard from current database.</p>
                 </div>
 
                 <div class="table-wrap">
-                    <table class="mobile-table">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -210,52 +203,97 @@
                     </table>
                 </div>
             </section>
+            
+            <section class="glass-card">
+               <div class="section-header">
+               <h3 class="neon">Top Performers</h3>
+            <p class="section-subtitle">Best players across categories</p>
+    </div>
 
-            <section class="glass-card mobile-section-card">
+        <div class="top-stats-grid">
+
+        <div class="stat-box">
+            <p>Top Scorer</p>
+            <h2 id="topScorer">-</h2>
+        </div>
+
+        <div class="stat-box">
+            <p>Top Wickets</p>
+            <h2 id="topWickets">-</h2>
+        </div>
+
+        <div class="stat-box">
+            <p>Best Economy</p>
+            <h2 id="bestEconomy">-</h2>
+        </div>
+
+        <div class="stat-box">
+            <p>Most Sixes</p>
+            <h2 id="mostSixes">-</h2>
+         </div>
+        
+        <div class="stat-box">
+            <p>Most Fours</p>
+            <h2 id="mostFours">-</h2>
+        </div>
+
+        </div>
+       </section>
+
+            <!-- THIS OVER -->
+            <section class="glass-card">
                 <div class="section-header">
                     <h3 class="neon">This Over</h3>
-                    <p class="section-subtitle">Ball by ball summary</p>
+                    <p class="section-subtitle">Ball-by-ball summary</p>
                 </div>
 
-                <div class="over-summary mobile-over-summary">
+                <div class="over-summary">
                     <div class="over-title">Over <span id="overNo">1</span></div>
                     <div id="overBalls" class="ball-list">
-                        <span class="ball-item">0</span>
+                        <span class="ball-item empty-ball"></span>
+                        <span class="ball-item empty-ball"></span>
+                        <span class="ball-item empty-ball"></span>
+                        <span class="ball-item empty-ball"></span>
+                        <span class="ball-item empty-ball"></span>
+                        <span class="ball-item empty-ball"></span>
                     </div>
                     <div class="over-total">Total: <span id="overTotal">0</span></div>
                 </div>
             </section>
 
-            <section class="glass-card mobile-section-card">
+            <!-- COMMENTARY -->
+            <section class="glass-card">
                 <div class="section-header">
                     <h3 class="neon">Live Commentary</h3>
                     <p class="section-subtitle">Automatic ball-by-ball commentary</p>
                 </div>
 
-                <div id="commentaryBox" class="commentary-box mobile-commentary-box">
+                <div id="commentaryBox" class="commentary-box">
                     <p class="commentary-line">No commentary yet.</p>
                 </div>
             </section>
 
-            <section class="glass-card mobile-section-card">
+            <!-- CHART -->
+            <section class="glass-card">
                 <div class="section-header">
                     <h3 class="neon">Runs Progress</h3>
                     <p class="section-subtitle">Live score growth by over</p>
                 </div>
 
-                <div class="chart-wrap mobile-chart-wrap">
+                <div class="chart-wrap">
                     <canvas id="runsChart"></canvas>
                 </div>
             </section>
 
-            <section class="glass-card mobile-section-card">
+            <!-- POINTS TABLE -->
+            <section class="glass-card">
                 <div class="section-header">
                     <h3 class="neon">Points Table</h3>
-                    <p class="section-subtitle">League standings for the teams you manage from the admin panel.</p>
+                    <p class="section-subtitle">League standings with team logos.</p>
                 </div>
 
                 <div class="table-wrap">
-                    <table class="mobile-table">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Team</th>
@@ -272,9 +310,9 @@
                             {% for row in points_table %}
                             <tr>
                                 <td class="team-name-cell">
-    <img src="{% static row.logo %}" alt="{{ row.team }}" class="table-team-logo">
-    <span>{{ row.team }}</span>
-</td>
+                                    <img src="{% static row.logo %}" alt="{{ row.team }}" class="table-team-logo">
+                                    <span>{{ row.team }}</span>
+                                </td>
                                 <td>{{ row.played }}</td>
                                 <td>{{ row.won }}</td>
                                 <td>{{ row.lost }}</td>
@@ -301,7 +339,7 @@
                     <p class="section-subtitle">Please create a match from the admin panel first.</p>
                 </div>
 
-                <div class="quick-links" style="margin-top: 20px;">
+                <div class="quick-links" style="margin-top:20px;">
                     <a href="{% url 'admin_panel' %}" class="btn primary-btn">Go to Admin Panel</a>
                     <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
                 </div>
@@ -314,7 +352,35 @@
     <aside class="side-banner right-banner">
         <img src="{% static 'dashboard/images/right-player.png' %}" alt="Right Cricketer">
     </aside>
+
 </div>
+
+<!-- FOOTER INSIDE BODY -->
+<footer class="footer">
+    <div>
+        <h3>Live Cricket</h3>
+        <p>Real-time cricket scores, stats, points table and match insights.</p>
+    </div>
+
+    <div>
+        <h4>Contact</h4>
+        <p>Email: support@livecricket.com</p>
+        <p>Phone: +91 98765 43210</p>
+    </div>
+
+    <div>
+        <h4>Quick Links</h4>
+        <p>Live Dashboard</p>
+        <p>Player Stats</p>
+        <p>Points Table</p>
+    </div>
+
+    <div>
+        <h4>Project</h4>
+        <p>Built with Django, SQLite and JavaScript APIs.</p>
+        <p>© 2026 Live Cricket. All rights reserved.</p>
+    </div>
+</footer>
 
 {% if match %}
 <audio id="wicketSound" src="{% static 'dashboard/sounds/wicket.mp3' %}"></audio>
@@ -322,6 +388,7 @@
 <audio id="fourSound" src="{% static 'dashboard/sounds/four.mp3' %}"></audio>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 let selectedMatchId = "{{ match.id|default:'' }}";
 let runsChart = null;
@@ -357,7 +424,8 @@ function getLogoPath(teamName) {
         "Lucknow Super Giants": STATIC_BASE + "lsg.png",
         "Gujarat Titans": STATIC_BASE + "gt.png"
     };
-    return logos[teamName] || (STATIC_BASE + "default.png");
+
+    return logos[teamName] || STATIC_BASE + "default.png";
 }
 
 function normalizeTeamClass(teamName) {
@@ -384,6 +452,7 @@ function normalizeTeamClass(teamName) {
         "GT": "team-gt",
         "Gujarat Titans": "team-gt"
     };
+
     return map[teamName] || "";
 }
 
@@ -446,30 +515,19 @@ function createChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: "top",
                     labels: {
-                        color: "#ffffff",
-                        boxWidth: 28,
-                        padding: 14
+                        color: "#ffffff"
                     }
                 }
             },
             scales: {
                 x: {
-                    ticks: {
-                        color: "rgba(255,255,255,0.7)"
-                    },
-                    grid: {
-                        color: "rgba(255,255,255,0.06)"
-                    }
+                    ticks: { color: "rgba(255,255,255,0.7)" },
+                    grid: { color: "rgba(255,255,255,0.06)" }
                 },
                 y: {
-                    ticks: {
-                        color: "rgba(255,255,255,0.7)"
-                    },
-                    grid: {
-                        color: "rgba(255,255,255,0.06)"
-                    }
+                    ticks: { color: "rgba(255,255,255,0.7)" },
+                    grid: { color: "rgba(255,255,255,0.06)" }
                 }
             }
         }
@@ -477,6 +535,7 @@ function createChart() {
 }
 
 function updateScoreboard() {
+    document.getElementById("loadingText").style.display = "block";
     fetch(`/get-score/${getMatchQuery()}`)
         .then(res => res.json())
         .then(data => {
@@ -485,7 +544,8 @@ function updateScoreboard() {
             const battingTeam = data.batting_team || team1;
             const bowlingTeam = data.bowling_team || team2;
             const resultText = data.result_text || data.status || "Live";
-
+            
+            
             document.getElementById("team1").innerText = team1.toUpperCase();
             document.getElementById("team2").innerText = team2.toUpperCase();
             document.getElementById("team1Side").innerText = battingTeam.toUpperCase();
@@ -501,9 +561,15 @@ function updateScoreboard() {
             document.getElementById("resultText").innerText = resultText;
             document.getElementById("winProbability").innerText = `${data.win_probability ?? 50}%`;
 
+            document.getElementById("target").innerText = data.target ?? 0;
+            document.getElementById("innings").innerText = data.innings ?? 1;
+            document.getElementById("apiMode").innerText = data.api ? "Live API" : "Local";
+            document.getElementById("loadingText").style.display = "none";
+
             const matchStatus = document.getElementById("matchStatus");
             matchStatus.innerText = data.status || "In Progress";
             matchStatus.classList.remove("completed");
+
             if ((data.status || "").toLowerCase() === "completed") {
                 matchStatus.classList.add("completed");
             }
@@ -538,6 +604,7 @@ function updateScoreboard() {
             }
 
             const winnerBanner = document.getElementById("winnerBanner");
+
             if (resultText.toLowerCase().includes("won")) {
                 winnerBanner.style.display = "block";
                 winnerBanner.innerText = "🏆 " + resultText;
@@ -553,19 +620,19 @@ function updateScoreboard() {
                 data.last_wicket_text || "None";
 
             const pomCard = document.getElementById("playerOfMatchCard");
-            const pomName = document.getElementById("pomName");
-            const pomTeam = document.getElementById("pomTeam");
-            const pomFigures = document.getElementById("pomFigures");
 
             if ((data.status || "").toLowerCase() === "completed" && data.player_of_match) {
                 pomCard.style.display = "block";
-                pomName.innerText = data.player_of_match;
-                pomTeam.innerText = data.player_of_match_team || "-";
-                pomFigures.innerText = data.player_of_match_figures || "-";
+                document.getElementById("pomName").innerText = data.player_of_match;
+                document.getElementById("pomTeam").innerText = data.player_of_match_team || "-";
+                document.getElementById("pomFigures").innerText = data.player_of_match_figures || "-";
             } else {
                 pomCard.style.display = "none";
             }
-        });
+        })
+        .catch(() => {
+         document.getElementById("loadingText").innerText = "Unable to load live score";
+});
 }
 
 function updatePlayers() {
@@ -615,9 +682,9 @@ function updatePointsTable() {
                 ? rows.map(team => `
                     <tr>
                         <td class="team-name-cell">
-                      <img src="/static/${team.logo}" alt="${team.team}" class="table-team-logo">
-                     <span>${team.team}</span>
-                     </td>
+                            <img src="/static/${team.logo}" alt="${team.team}" class="table-team-logo">
+                            <span>${team.team}</span>
+                        </td>
                         <td>${team.played}</td>
                         <td>${team.won}</td>
                         <td>${team.lost}</td>
@@ -645,30 +712,29 @@ function updateOverData() {
             if (balls.length > 0) {
                 balls.forEach(ball => {
                     const ballText = String(ball);
+                    let cls = "ball-item";
 
-                    if (ballText === "W") {
-                        ballsHtml += `<span class="ball-item wicket-ball">${ballText}</span>`;
-                    } else if (
+                    if (ballText === "W") cls += " wicket-ball";
+                    else if (
                         ballText.startsWith("LB") ||
                         ballText.startsWith("WD") ||
                         ballText.startsWith("NB") ||
                         ballText.startsWith("B")
-                    ) {
-                        ballsHtml += `<span class="ball-item extra-ball">${ballText}</span>`;
-                    } else {
-                        ballsHtml += `<span class="ball-item">${ballText}</span>`;
-                    }
+                    ) cls += " extra-ball";
+
+                    ballsHtml += `<span class="${cls}">${ballText}</span>`;
                 });
 
-                const emptyCount = Math.max(0, 6 - legalBalls);
-                for (let i = 0; i < emptyCount; i++) {
+                for (let i = 0; i < Math.max(0, 6 - legalBalls); i++) {
                     ballsHtml += `<span class="ball-item empty-ball"></span>`;
                 }
 
                 const latestBall = String(balls[balls.length - 1]);
+
                 if (lastBallEvent !== null && latestBall !== lastBallEvent) {
                     playMatchSound(latestBall);
                 }
+
                 lastBallEvent = latestBall;
             } else {
                 for (let i = 0; i < 6; i++) {
@@ -709,6 +775,26 @@ function updateChart() {
             runsChart.update();
         });
 }
+function updateAdvancedStats() {
+    fetch("/advanced-stats/")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("topScorer").innerText =
+                data.top_scorer?.name + " (" + data.top_scorer?.runs + ")";
+
+            document.getElementById("topWickets").innerText =
+                data.top_wickets?.name + " (" + data.top_wickets?.wickets + ")";
+
+            document.getElementById("bestEconomy").innerText =
+                data.best_economy?.name + " (" + data.best_economy?.economy + ")";
+
+            document.getElementById("mostSixes").innerText =
+                data.most_sixes?.name + " (" + data.most_sixes?.sixes + ")";
+
+            document.getElementById("mostFours").innerText =
+                data.most_fours?.name + " (" + data.most_fours?.fours + ")";
+        });
+}
 
 function refreshAll() {
     updateScoreboard();
@@ -718,6 +804,7 @@ function refreshAll() {
     updateOverData();
     updateCommentary();
     updateChart();
+    updateAdvancedStats();   // ⭐ ADD THIS
 }
 
 createChart();
@@ -725,5 +812,55 @@ refreshAll();
 setInterval(refreshAll, 2000);
 </script>
 {% endif %}
+
+<script>
+function toggleTheme() {
+    document.body.classList.toggle("light-mode");
+
+    if (document.body.classList.contains("light-mode")) {
+        localStorage.setItem("theme", "light");
+        document.getElementById("themeBtn").innerText = "☀️ Light";
+    } else {
+        localStorage.setItem("theme", "dark");
+        document.getElementById("themeBtn").innerText = "🌙 Dark";
+    }
+}
+
+if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    const btn = document.getElementById("themeBtn");
+    if (btn) btn.innerText = "☀️ Light";
+}
+
+const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+const socket = new WebSocket(wsProtocol + window.location.host + "/ws/live-score/");
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+
+    document.getElementById("score1").innerText = `${data.runs ?? 0}/${data.wickets ?? 0}`;
+    document.getElementById("overs").innerText = data.overs || "0.0";
+    document.getElementById("matchStatus").innerText = data.status || "In Progress";
+    document.getElementById("resultText").innerText = data.result_text || data.status || "Live";
+    document.getElementById("target").innerText = data.target ?? 0;
+    document.getElementById("innings").innerText = data.innings ?? 1;
+    document.getElementById("partnershipText").innerText =
+        `${data.partnership_runs ?? 0} (${data.partnership_balls ?? 0})`;
+    document.getElementById("lastWicketText").innerText = data.last_wicket_text || "None";
+};
+
+socket.onopen = function() {
+    console.log("WebSocket connected");
+};
+
+socket.onerror = function() {
+    console.log("WebSocket error. Polling backup will continue.");
+};
+
+socket.onclose = function() {
+    console.log("WebSocket closed. Polling backup will continue.");
+};
+</script>
+
 </body>
 </html>

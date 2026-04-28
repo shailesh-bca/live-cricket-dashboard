@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from .services.cricket_api import get_live_match
 import os
 
 from .models import (
@@ -678,6 +681,7 @@ def _record_ball(match, request):
         _start_second_innings(match)
     elif match.innings == 2 and (match.runs >= match.target or _is_innings_complete(match)):
         _finish_match_with_result(match)
+    send_live_score_update(match)
 
 
 def _undo_last_ball(match):
@@ -724,6 +728,36 @@ def _undo_last_ball(match):
         players.save()
     match.save()
     last_ball.delete()
+
+def send_live_score_update(match):
+    if not match:
+        return
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        "live_score",
+        {
+            "type": "score_update",
+            "data": {
+                "team1": match.team1,
+                "team2": match.team2,
+                "batting_team": match.batting_team,
+                "bowling_team": match.bowling_team,
+                "runs": match.runs,
+                "wickets": match.wickets,
+                "overs": match.overs,
+                "status": match.status,
+                "result_text": match.result_text,
+                "innings": match.innings,
+                "target": match.target,
+                "win_probability": 50,
+                "partnership_runs": match.partnership_runs,
+                "partnership_balls": match.partnership_balls,
+                "last_wicket_text": match.last_wicket_text,
+            },
+        },
+    )
 
 
 def index(request):
@@ -888,33 +922,41 @@ def matches_page(request):
     return render(request, "dashboard/matches.html", {"matches": matches})
 
 
-def get_score(request):
-    match = _get_selected_match(request.GET.get("match_id"))
+from .services.cricket_api import get_live_match
 
-    if not match:
-        return JsonResponse(
-            {
-                "team1": "Team A",
-                "team2": "Team B",
-                "batting_team": "Team A",
-                "bowling_team": "Team B",
-                "runs": 0,
-                "wickets": 0,
-                "overs": "0.0",
-                "status": "No Match",
-                "result_text": "",
-                "innings": 1,
-                "target": 0,
-                "first_innings_runs": 0,
-                "win_probability": 50.0,
-                "partnership_runs": 0,
-                "partnership_balls": 0,
-                "last_wicket_text": "",
-                "player_of_match": "",
-                "player_of_match_team": "",
-                "player_of_match_figures": "",
-            }
-        )
+def get_score(request):
+    api_data = get_live_match()
+
+    if api_data:
+        return JsonResponse({
+            "team1": api_data["team1"],
+            "team2": api_data["team2"],
+            "batting_team": api_data["batting_team"],
+            "bowling_team": api_data["bowling_team"],
+            "runs": api_data["runs"],
+            "wickets": api_data["wickets"],
+            "overs": api_data["overs"],
+            "status": api_data["status"],
+            "result_text": api_data["status"],
+            "innings": 1,
+            "target": 0,
+            "first_innings_runs": 0,
+            "win_probability": 50,
+            "partnership_runs": 0,
+            "partnership_balls": 0,
+            "last_wicket_text": "",
+            "player_of_match": "",
+            "player_of_match_team": "",
+            "player_of_match_figures": "",
+            "api": True,
+        })
+
+    # keep your existing DB fallback code below this
+
+    # fallback to DB (your existing code)
+
+    # fallback to DB
+    match = _get_selected_match(request.GET.get("match_id"))
 
     win_probability = 50.0
 
@@ -1257,3 +1299,12 @@ def edit_scorecard_page(request):
             "second_innings_scorecard": second_innings_scorecard,
         },
     )
+
+def advanced_stats_api(request):
+    return JsonResponse({
+        "top_scorer": PlayerStat.objects.order_by("-runs").values().first(),
+        "top_wickets": PlayerStat.objects.order_by("-wickets").values().first(),
+        "best_economy": PlayerStat.objects.order_by("economy").values().first(),
+        "most_sixes": PlayerStat.objects.order_by("-sixes").values().first(),
+        "most_fours": PlayerStat.objects.order_by("-fours").values().first(),
+    })

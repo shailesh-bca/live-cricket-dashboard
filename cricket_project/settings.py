@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "dashboard",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -88,5 +89,13 @@ LOGOUT_REDIRECT_URL = "login"
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+ASGI_APPLICATION = "cricket_project.asgi.application"
+
 import os
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

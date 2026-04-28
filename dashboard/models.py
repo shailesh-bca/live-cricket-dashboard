@@ -91,13 +91,16 @@ class ScorecardEntry(models.Model):
 class PlayerStat(models.Model):
     name = models.CharField(max_length=100)
     team = models.CharField(max_length=100, blank=True, default="")
+
     runs = models.IntegerField(default=0)
     balls = models.IntegerField(default=0)
     wickets = models.IntegerField(default=0)
-    strike_rate = models.FloatField(default=0)
 
-    def __str__(self):
-        return self.name
+    fours = models.IntegerField(default=0)
+    sixes = models.IntegerField(default=0)
+    economy = models.FloatField(default=0)
+
+    strike_rate = models.FloatField(default=0)
 
 
 class PointsTableEntry(models.Model):

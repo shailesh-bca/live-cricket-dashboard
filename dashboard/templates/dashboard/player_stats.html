@@ -8,21 +8,28 @@
     <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
 </head>
 <body>
+
 <div class="page-wrapper admin-page">
+
     <header class="topbar">
-        <div class="logo">Player Stats</div>
+        <div class="logo">📊 Player Stats</div>
+
         <div class="topbar-actions">
             <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
             <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
             <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+            <button onclick="toggleTheme()" class="theme-btn" id="themeBtn">🌙 Dark</button>
         </div>
     </header>
 
     <main class="live-dashboard">
+
         <section class="glass-card">
             <div class="section-header">
-                <h3 class="neon">Top Player Statistics</h3>
-                <p class="section-subtitle">Full batting and bowling records in a cleaner separate page.</p>
+                <h3 class="neon">Player Rankings</h3>
+                <p class="section-subtitle">
+                    Professional player statistics with batting, bowling and boundary leaderboards.
+                </p>
             </div>
 
             <div class="stats-hero-grid">
@@ -33,25 +40,77 @@
 
                 <div class="mini-stat-card">
                     <div class="mini-stat-label">Top Scorer</div>
-                    <div class="mini-stat-value">
-                        {% if player_stats %}
-                            {{ player_stats.0.name }}
-                        {% else %}
-                            -
-                        {% endif %}
+                    <div class="mini-stat-value" id="heroTopScorer">
+                        {% if player_stats %}{{ player_stats.0.name }}{% else %}-{% endif %}
                     </div>
                 </div>
 
                 <div class="mini-stat-card">
                     <div class="mini-stat-label">Best Runs</div>
-                    <div class="mini-stat-value">
-                        {% if player_stats %}
-                            {{ player_stats.0.runs }}
-                        {% else %}
-                            0
-                        {% endif %}
+                    <div class="mini-stat-value" id="heroBestRuns">
+                        {% if player_stats %}{{ player_stats.0.runs }}{% else %}0{% endif %}
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Top Performers</h3>
+                <p class="section-subtitle">Category-wise leaders like a real cricket website.</p>
+            </div>
+
+            <div class="top-stats-grid">
+
+                <div class="stat-box">
+                    <div class="stat-icon">🏏</div>
+                    <p>Most Runs</p>
+                    <h2 id="topScorerName">-</h2>
+                    <span id="topScorerValue">0 runs</span>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-icon">🎯</div>
+                    <p>Highest Wicket Taker</p>
+                    <h2 id="topWicketName">-</h2>
+                    <span id="topWicketValue">0 wickets</span>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-icon">💰</div>
+                    <p>Most Economical Bowler</p>
+                    <h2 id="economyName">-</h2>
+                    <span id="economyValue">0.00 economy</span>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-icon">💥</div>
+                    <p>Most Sixes</p>
+                    <h2 id="sixesName">-</h2>
+                    <span id="sixesValue">0 sixes</span>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-icon">🔥</div>
+                    <p>Most Fours</p>
+                    <h2 id="foursName">-</h2>
+                    <span id="foursValue">0 fours</span>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-icon">⚡</div>
+                    <p>Highest Strike Rate</p>
+                    <h2 id="strikeRateName">-</h2>
+                    <span id="strikeRateValue">0.00 SR</span>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <div class="section-header">
+                <h3 class="neon">Complete Player Table</h3>
+                <p class="section-subtitle">Full batting and bowling performance records.</p>
             </div>
 
             <div class="table-wrap">
@@ -59,33 +118,50 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Name</th>
+                            <th>Player</th>
                             <th>Team</th>
                             <th>Runs</th>
                             <th>Balls</th>
-                            <th>Strike Rate</th>
-                            <th>Wickets</th>
+                            <th>SR</th>
+                            <th>4s</th>
+                            <th>6s</th>
+                            <th>Wkts</th>
+                            <th>Eco</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for stat in player_stats %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                {% if forloop.counter == 1 %}
+                                    <span class="position-badge top-rank">1</span>
+                                {% elif forloop.counter == 2 %}
+                                    <span class="position-badge second-rank">2</span>
+                                {% else %}
+                                    <span class="position-badge">{{ forloop.counter }}</span>
+                                {% endif %}
+                            </td>
+
                             <td>
                                 <div class="table-name-cell">
                                     <span class="table-avatar">{{ stat.name|slice:":1" }}</span>
                                     <span>{{ stat.name }}</span>
                                 </div>
                             </td>
+
                             <td>{{ stat.team|default:"-" }}</td>
-                            <td>{{ stat.runs }}</td>
+                            <td><strong>{{ stat.runs }}</strong></td>
                             <td>{{ stat.balls }}</td>
                             <td>{{ stat.strike_rate }}</td>
-                            <td>{{ stat.wickets }}</td>
+                            <td>{{ stat.fours|default:0 }}</td>
+                            <td>{{ stat.sixes|default:0 }}</td>
+                            <td><strong>{{ stat.wickets }}</strong></td>
+                            <td>{{ stat.economy|default:"0.00" }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7">No player stats available.</td>
+                            <td colspan="10">No player stats available.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -107,7 +183,10 @@
                         <div><strong>Runs</strong><span>{{ stat.runs }}</span></div>
                         <div><strong>Balls</strong><span>{{ stat.balls }}</span></div>
                         <div><strong>SR</strong><span>{{ stat.strike_rate }}</span></div>
+                        <div><strong>4s</strong><span>{{ stat.fours|default:0 }}</span></div>
+                        <div><strong>6s</strong><span>{{ stat.sixes|default:0 }}</span></div>
                         <div><strong>Wkts</strong><span>{{ stat.wickets }}</span></div>
+                        <div><strong>Eco</strong><span>{{ stat.economy|default:"0.00" }}</span></div>
                     </div>
                 </div>
                 {% empty %}
@@ -115,7 +194,96 @@
                 {% endfor %}
             </div>
         </section>
+
     </main>
 </div>
+
+<footer class="footer">
+    <div>
+        <h3>Live Cricket</h3>
+        <p>Real-time cricket scores, rankings and match insights.</p>
+    </div>
+
+    <div>
+        <h4>Contact</h4>
+        <p>Email: support@livecricket.com</p>
+        <p>Phone: +91 98765 43210</p>
+    </div>
+
+    <div>
+        <h4>Quick Links</h4>
+        <p>Live Dashboard</p>
+        <p>Points Table</p>
+        <p>All Matches</p>
+    </div>
+
+    <div>
+        <h4>Project</h4>
+        <p>Built with Django, SQLite and JavaScript APIs.</p>
+        <p>© 2026 Live Cricket. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+}
+
+function updateAdvancedStats() {
+    fetch("/advanced-stats-api/")
+        .then(res => res.json())
+        .then(data => {
+            const topScorer = data.top_scorer || {};
+            const topWickets = data.top_wickets || {};
+            const bestEconomy = data.best_economy || {};
+            const mostSixes = data.most_sixes || {};
+            const mostFours = data.most_fours || {};
+
+            setText("topScorerName", topScorer.name || "-");
+            setText("topScorerValue", `${topScorer.runs || 0} runs`);
+
+            setText("topWicketName", topWickets.name || "-");
+            setText("topWicketValue", `${topWickets.wickets || 0} wickets`);
+
+            setText("economyName", bestEconomy.name || "-");
+            setText("economyValue", `${bestEconomy.economy || "0.00"} economy`);
+
+            setText("sixesName", mostSixes.name || "-");
+            setText("sixesValue", `${mostSixes.sixes || 0} sixes`);
+
+            setText("foursName", mostFours.name || "-");
+            setText("foursValue", `${mostFours.fours || 0} fours`);
+
+            setText("strikeRateName", topScorer.name || "-");
+            setText("strikeRateValue", `${topScorer.strike_rate || "0.00"} SR`);
+        })
+        .catch(() => {
+            console.log("Advanced stats API not available yet.");
+        });
+}
+
+function toggleTheme() {
+    document.body.classList.toggle("light-mode");
+
+    if (document.body.classList.contains("light-mode")) {
+        localStorage.setItem("theme", "light");
+        document.getElementById("themeBtn").innerText = "☀️ Light";
+    } else {
+        localStorage.setItem("theme", "dark");
+        document.getElementById("themeBtn").innerText = "🌙 Dark";
+    }
+}
+
+if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light-mode");
+    const btn = document.getElementById("themeBtn");
+    if (btn) btn.innerText = "☀️ Light";
+}
+
+updateAdvancedStats();
+setInterval(updateAdvancedStats, 5000);
+</script>
+
 </body>
 </html>
