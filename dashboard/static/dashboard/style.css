@@ -1657,3 +1657,42 @@ body.light-mode .match-label,
 body.light-mode .neon {
     color: #16a34a !important;
 }
+/* ===== FOOTER ===== */
+.footer {
+    margin-top: 50px;
+    padding: 30px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.footer-section h4 {
+    margin-bottom: 12px;
+    color: #22c55e;
+}
+
+.footer-section p,
+.footer-section a {
+    display: block;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.footer-section a:hover {
+    color: #22c55e;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
