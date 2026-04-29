@@ -87,6 +87,12 @@ LOGIN_REDIRECT_URL = "admin_panel"
 LOGOUT_REDIRECT_URL = "login"
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "dashboard/static",
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 ASGI_APPLICATION = "cricket_project.asgi.application"

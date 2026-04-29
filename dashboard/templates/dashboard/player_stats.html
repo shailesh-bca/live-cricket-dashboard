@@ -6,13 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player Stats</title>
     <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+    <link rel="icon" href="{% static 'dashboard/images/favicon.png' %}" type="image/png">
 </head>
 <body>
 
 <div class="page-wrapper admin-page">
 
     <header class="topbar">
-        <div class="logo">📊 Player Stats</div>
+       <div class="logo-container">
+    <img src="{% static 'dashboard/images/favicon.png' %}" class="site-logo" alt="CricPulse">
+    <div class="site-title">
+        <h2>CricPulse</h2>
+        <span class="tagline">Take a Drinks Break</span>
+    </div>
+</div>
 
         <div class="topbar-actions">
             <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
@@ -180,13 +187,34 @@
                     </div>
 
                     <div class="mobile-stats-grid">
-                        <div><strong>Runs</strong><span>{{ stat.runs }}</span></div>
-                        <div><strong>Balls</strong><span>{{ stat.balls }}</span></div>
-                        <div><strong>SR</strong><span>{{ stat.strike_rate }}</span></div>
-                        <div><strong>4s</strong><span>{{ stat.fours|default:0 }}</span></div>
-                        <div><strong>6s</strong><span>{{ stat.sixes|default:0 }}</span></div>
-                        <div><strong>Wkts</strong><span>{{ stat.wickets }}</span></div>
-                        <div><strong>Eco</strong><span>{{ stat.economy|default:"0.00" }}</span></div>
+                          <div class="mobile-stat-item">
+                          <strong>Runs</strong>
+                        <span>{{ stat.runs }}</span>
+                       </div>
+                     <div class="mobile-stat-item">
+                      <strong>Balls</strong>
+               <span>{{ stat.balls }}</span>
+</div>
+<div class="mobile-stat-item">
+    <strong>SR</strong>
+    <span>{{ stat.strike_rate }}</span>
+</div>
+<div class="mobile-stat-item">
+    <strong>4s</strong>
+    <span>{{ stat.fours|default:0 }}</span>
+</div>
+<div class="mobile-stat-item">
+    <strong>6s</strong>
+    <span>{{ stat.sixes|default:0 }}</span>
+</div>
+<div class="mobile-stat-item">
+    <strong>Wkts</strong>
+    <span>{{ stat.wickets }}</span>
+</div>
+<div class="mobile-stat-item">   
+    <strong>Eco</strong>
+                  <span>{{ stat.economy|default:"0.00" }}</span>
+                    </div>
                     </div>
                 </div>
                 {% empty %}

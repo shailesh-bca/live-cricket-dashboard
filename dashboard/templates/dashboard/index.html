@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Cricket Dashboard</title>
     <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+     <link rel="icon" href="{% static 'dashboard/images/favicon.png' %}" type="image/png">
 </head>
 
 <body>
@@ -18,12 +19,21 @@
     <div class="page-wrapper">
 
         <header class="topbar">
-            <div class="logo">🏏 Live Cricket Dashboard</div>
+           <div class="logo-container">
+    <img src="{% static 'dashboard/images/favicon.png' %}" class="site-logo" alt="CricPulse">
+    <div class="site-title">
+        <h2>CricPulse</h2>
+        <span class="tagline">Take a Drinks Break</span>
+    </div>
+</div>
+       
+      
 
             <div class="topbar-actions">
                 <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
                 <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
                 <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+                <a href="{% url 'fan_zone_page' %}" class="btn action-btn top-action-btn">Fan Zone</a>
                 <button onclick="toggleTheme()" class="theme-btn" id="themeBtn">🌙 Dark</button>
                 <div class="live-badge blink">LIVE</div>
             </div>
@@ -83,6 +93,11 @@
                             <span>CRR: <strong id="runrate">0.00</strong></span>
                             <span>Status: <strong id="resultText">{{ match.result_text|default:"Live" }}</strong></span>
                             <span>Win Probability: <strong id="winProbability">50%</strong></span>
+                            <div class="win-bar-wrap">
+                            <div class="win-bar">
+                            <div class="win-bar-fill" id="winBarFill"></div>
+                           </div>
+                         </div>
                         </div>
 
                         <div class="mini-stats score-stats-block extra-live-info">
@@ -559,7 +574,13 @@ function updateScoreboard() {
             document.getElementById("score1").innerText = `${data.runs ?? 0}/${data.wickets ?? 0}`;
             document.getElementById("overs").innerText = data.overs || "0.0";
             document.getElementById("resultText").innerText = resultText;
-            document.getElementById("winProbability").innerText = `${data.win_probability ?? 50}%`;
+            const winValue = data.win_probability ?? 50;
+            document.getElementById("winProbability").innerText = `${winValue}%`;
+
+            const winBar = document.getElementById("winBarFill");
+            if (winBar) {
+            winBar.style.width = `${winValue}%`;
+            }
 
             document.getElementById("target").innerText = data.target ?? 0;
             document.getElementById("innings").innerText = data.innings ?? 1;
@@ -776,7 +797,7 @@ function updateChart() {
         });
 }
 function updateAdvancedStats() {
-    fetch("/advanced-stats/")
+    fetch("/advanced-stats-api/")
         .then(res => res.json())
         .then(data => {
             document.getElementById("topScorer").innerText =
@@ -815,14 +836,16 @@ setInterval(refreshAll, 2000);
 
 <script>
 function toggleTheme() {
-    document.body.classList.toggle("light-mode");
+    const btn = document.getElementById("themeBtn");
 
     if (document.body.classList.contains("light-mode")) {
-        localStorage.setItem("theme", "light");
-        document.getElementById("themeBtn").innerText = "☀️ Light";
-    } else {
+        document.body.classList.remove("light-mode");
         localStorage.setItem("theme", "dark");
-        document.getElementById("themeBtn").innerText = "🌙 Dark";
+        if (btn) btn.innerText = "🌙 Dark";
+    } else {
+        document.body.classList.add("light-mode");
+        localStorage.setItem("theme", "light");
+        if (btn) btn.innerText = "☀️ Light";
     }
 }
 
@@ -861,6 +884,7 @@ socket.onclose = function() {
     console.log("WebSocket closed. Polling backup will continue.");
 };
 </script>
+
 
 </body>
 </html>

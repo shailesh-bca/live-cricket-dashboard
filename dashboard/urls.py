@@ -24,4 +24,5 @@ urlpatterns = [
     path('over-data/', views.over_data, name='over_data'),
     path('chart-data/', views.chart_data, name='chart_data'),
     path('advanced-stats-api/', views.advanced_stats_api, name='advanced_stats_api'),
+    path('fan-zone/', views.fan_zone_page, name='fan_zone_page'),
 ]

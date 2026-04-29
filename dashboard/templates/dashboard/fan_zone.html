@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Zone - CricPulse</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+    <link rel="icon" href="{% static 'dashboard/images/favicon.png' %}" type="image/png">
+</head>
+<body>
+
+<div class="page-wrapper admin-page">
+
+    <header class="topbar">
+        <div class="logo-container">
+            <img src="{% static 'dashboard/images/favicon.png' %}" class="site-logo">
+            <div class="site-title">
+                <h2>CricPulse</h2>
+                <span class="tagline">Fan Zone Mini Game</span>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
+            <a href="{% url 'player_stats_page' %}" class="btn action-btn top-action-btn">Player Stats</a>
+            <a href="{% url 'points_table_page' %}" class="btn action-btn top-action-btn">Points Table</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        <section class="glass-card fan-game-card">
+            <div class="section-header">
+                <h3 class="neon">🏏 Mini Cricket Game</h3>
+                <p class="section-subtitle">Play a quick 2-over cricket challenge while checking live scores.</p>
+            </div>
+
+            <div class="fan-score-box">
+                <div>
+                    <p>Score</p>
+                    <h1><span id="gameRuns">0</span>/<span id="gameWickets">0</span></h1>
+                </div>
+
+                <div>
+                    <p>Overs</p>
+                    <h1 id="gameOvers">0.0</h1>
+                </div>
+
+                <div>
+                    <p>Target</p>
+                    <h1>30</h1>
+                </div>
+            </div>
+
+            <div class="shot-result" id="shotResult">
+                Tap a shot button to start!
+            </div>
+
+            <div class="fan-buttons">
+                <button class="btn action-btn" onclick="playShot('defense')">Defensive</button>
+                <button class="btn primary-btn" onclick="playShot('normal')">Hit Shot</button>
+                <button class="btn six-btn" onclick="playShot('power')">Power Hit</button>
+                <button class="btn danger-btn" onclick="resetGame()">Reset</button>
+            </div>
+
+            <div class="ball-list" id="gameBalls"></div>
+        </section>
+    </main>
+</div>
+
+<script>
+let runs = 0;
+let wickets = 0;
+let balls = 0;
+let target = 36;
+let maxBalls = 18;
+let freeHit = false;
+
+const commentary = document.getElementById("shotResult");
+
+function getOversText() {
+    return Math.floor(balls / 6) + "." + (balls % 6);
+}
+
+function updateGameUI(result) {
+    document.getElementById("gameRuns").innerText = runs;
+    document.getElementById("gameWickets").innerText = wickets;
+    document.getElementById("gameOvers").innerText = getOversText();
+
+    const ball = document.createElement("span");
+    ball.className = result === "W" ? "ball-item wicket-ball" : "ball-item";
+    ball.innerText = result;
+    document.getElementById("gameBalls").appendChild(ball);
+}
+
+function playShot(type) {
+    if (wickets >= 5 || balls >= maxBalls || runs >= target) return;
+
+    let outcomes;
+
+    if (type === "defense") {
+        outcomes = [0, 0, 1, 1, 2, 2, "W"];
+    } else if (type === "power") {
+        outcomes = [0, 2, 4, 4, 6, 6, "W", "W", "NB"];
+    } else {
+        outcomes = [0, 1, 1, 2, 3, 4, 6, "W"];
+    }
+
+    let result = outcomes[Math.floor(Math.random() * outcomes.length)];
+
+    if (result === "NB") {
+        runs += 1;
+        freeHit = true;
+        commentary.innerText = "🚨 No Ball! +1 run and next ball is Free Hit!";
+        updateGameUI("NB");
+        return;
+    }
+
+    balls++;
+
+    if (result === "W") {
+        if (freeHit) {
+            commentary.innerText = "😮 Wicket on Free Hit! Not out!";
+            result = 0;
+            freeHit = false;
+        } else {
+            wickets++;
+            commentary.innerText = "💥 WICKET! Big moment in the game!";
+        }
+    } else {
+        runs += result;
+        freeHit = false;
+
+        if (result === 6) commentary.innerText = "🔥 SIX! Massive hit!";
+        else if (result === 4) commentary.innerText = "⚡ FOUR! Beautiful timing!";
+        else if (result === 0) commentary.innerText = "👏 Dot ball. Good bowling!";
+        else commentary.innerText = `🏏 Good running! ${result} run${result > 1 ? "s" : ""}`;
+    }
+
+    updateGameUI(result);
+
+    if (runs >= target) {
+        commentary.innerText = "🏆 You won the mini match!";
+    } else if (wickets >= 5 || balls >= maxBalls) {
+        commentary.innerText = `Match over! You scored ${runs}/${wickets}. Try again.`;
+    }
+}
+
+function resetGame() {
+    runs = 0;
+    wickets = 0;
+    balls = 0;
+    freeHit = false;
+
+    document.getElementById("gameRuns").innerText = 0;
+    document.getElementById("gameWickets").innerText = 0;
+    document.getElementById("gameOvers").innerText = "0.0";
+    document.getElementById("gameBalls").innerHTML = "";
+    commentary.innerText = "Tap a shot button to start!";
+}
+</script>
+
+</body>
+</html>

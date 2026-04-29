@@ -6,11 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Points Table</title>
     <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+    <link rel="icon" href="{% static 'dashboard/images/favicon.png' %}" type="image/png">
 </head>
 <body>
 <div class="page-wrapper admin-page">
     <header class="topbar">
-        <div class="logo">Points Table</div>
+        <div class="logo-container">
+    <img src="{% static 'dashboard/images/favicon.png' %}" class="site-logo" alt="CricPulse">
+    <div class="site-title">
+        <h2>CricPulse</h2>
+        <span class="tagline">Take a Drinks Break</span>
+    </div>
+</div>
         <div class="topbar-actions">
             <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
             <a href="{% url 'matches' %}" class="btn action-btn top-action-btn">All Matches</a>
@@ -81,7 +88,11 @@
                                     <span class="position-badge">{{ forloop.counter }}</span>
                                 {% endif %}
                             </td>
-                            <td><strong>{{ row.team }}</strong></td>
+                            <td class="team-name-cell">
+                            <img src="{% static row.logo %}" alt="{{ row.team }}" class="table-team-logo"
+                                 onerror="this.src='/static/dashboard/images/teams/default.png'">
+                              <strong>{{ row.team }}</strong>
+                                </td>
                             <td>{{ row.played }}</td>
                             <td>{{ row.won }}</td>
                             <td>{{ row.lost }}</td>

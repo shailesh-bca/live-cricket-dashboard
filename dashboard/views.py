@@ -362,6 +362,10 @@ def _update_player_stat(request):
     runs = _to_int(request.POST.get("stat_runs"))
     balls = _to_int(request.POST.get("stat_balls"))
     wickets = _to_int(request.POST.get("stat_wickets"))
+    fours = _to_int(request.POST.get("stat_fours"))
+    sixes = _to_int(request.POST.get("stat_sixes"))
+    economy = _to_float(request.POST.get("stat_economy"))
+
     strike_rate = round((runs / balls) * 100, 2) if balls else 0
 
     PlayerStat.objects.update_or_create(
@@ -371,6 +375,9 @@ def _update_player_stat(request):
             "runs": runs,
             "balls": balls,
             "wickets": wickets,
+            "fours": fours,
+            "sixes": sixes,
+            "economy": economy,
             "strike_rate": strike_rate,
         },
     )
@@ -1308,3 +1315,6 @@ def advanced_stats_api(request):
         "most_sixes": PlayerStat.objects.order_by("-sixes").values().first(),
         "most_fours": PlayerStat.objects.order_by("-fours").values().first(),
     })
+
+def fan_zone_page(request):
+    return render(request, "dashboard/fan_zone.html")
