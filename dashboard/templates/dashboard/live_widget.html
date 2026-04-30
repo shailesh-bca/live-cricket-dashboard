@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Live Matches | CricPulse</title>
+    <link rel="stylesheet" href="{% static 'dashboard/style.css' %}">
+    <link rel="icon" href="{% static 'dashboard/images/favicon.png' %}">
+</head>
+<body>
+
+<div class="page-wrapper admin-page">
+
+    <header class="topbar">
+        <div class="logo-container">
+            <img src="{% static 'dashboard/images/favicon.png' %}" class="site-logo" alt="CricPulse">
+            <div class="site-title">
+                <h2>CricPulse</h2>
+                <span class="tagline">Real Live Matches</span>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <a href="{% url 'index' %}" class="btn primary-btn">Live Dashboard</a>
+            <a href="{% url 'player_stats_page' %}" class="btn action-btn">Player Stats</a>
+            <a href="{% url 'points_table_page' %}" class="btn action-btn">Points Table</a>
+            <a href="{% url 'fan_zone_page' %}" class="btn action-btn">Fan Zone</a>
+        </div>
+    </header>
+
+    <main class="live-dashboard">
+        <section class="glass-card live-widget-section">
+            <div class="section-header">
+                <p class="match-label">REAL DATA</p>
+                <h3 class="neon">🌍 Live Cricket Matches</h3>
+                <p class="section-subtitle">
+                    External live-score widget styled inside your CricPulse dashboard.
+                </p>
+            </div>
+
+            <div class="widget-frame">
+                <script src="https://cdorgapi.b-cdn.net/widgets/score.js"></script>
+            </div>
+
+            <p class="widget-note">
+                This section uses a third-party cricket data widget. Your main dashboard and admin panel still work independently.
+            </p>
+        </section>
+    </main>
+
+</div>
+
+</body>
+</html>

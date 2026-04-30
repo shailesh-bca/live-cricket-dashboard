@@ -1318,3 +1318,8 @@ def advanced_stats_api(request):
 
 def fan_zone_page(request):
     return render(request, "dashboard/fan_zone.html")
+
+from django.shortcuts import render
+
+def live_widget_page(request):
+    return render(request, 'dashboard/live_widget.html')

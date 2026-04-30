@@ -25,4 +25,5 @@ urlpatterns = [
     path('chart-data/', views.chart_data, name='chart_data'),
     path('advanced-stats-api/', views.advanced_stats_api, name='advanced_stats_api'),
     path('fan-zone/', views.fan_zone_page, name='fan_zone_page'),
+    path('live-widget/', views.live_widget_page, name='live_widget'),
 ]
